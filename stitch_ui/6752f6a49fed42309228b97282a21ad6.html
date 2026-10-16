@@ -1,0 +1,444 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Euler - Olympiad Prep Dashboard</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..700&amp;family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- KaTeX CDN & Auto-render extension -->
+<link href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cmu-serif@5.0.8/index.css">
+<script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\(', right: '\\)', display: false},
+        {left: '\\[', right: '\\]', display: true}
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-bright": "#39393e",
+            "on-surface-variant": "#ccc3d8",
+            "outline": "#958da1",
+            "inverse-primary": "#732ee4",
+            "on-background": "#e4e1e9",
+            "tertiary-fixed": "#6ffbbe",
+            "on-error-container": "#ffdad6",
+            "tertiary-container": "#007650",
+            "surface": "#131318",
+            "on-surface": "#e4e1e9",
+            "error-container": "#93000a",
+            "secondary-fixed-dim": "#7bd0ff",
+            "on-primary": "#3f008e",
+            "on-primary-container": "#ede0ff",
+            "secondary-fixed": "#c4e7ff",
+            "on-tertiary-container": "#76ffc2",
+            "on-secondary-container": "#00374d",
+            "primary": "#d2bbff",
+            "surface-dim": "#131318",
+            "primary-fixed-dim": "#d2bbff",
+            "outline-variant": "#4a4455",
+            "on-error": "#690005",
+            "tertiary-fixed-dim": "#4edea3",
+            "on-secondary": "#00354a",
+            "inverse-on-surface": "#303035",
+            "surface-container-lowest": "#0e0e13",
+            "background": "#131318",
+            "error": "#ffb4ab",
+            "on-tertiary-fixed": "#002113",
+            "secondary-container": "#00a6e0",
+            "tertiary": "#4edea3",
+            "primary-fixed": "#eaddff",
+            "on-tertiary-fixed-variant": "#005236",
+            "secondary": "#7bd0ff",
+            "on-tertiary": "#003824",
+            "surface-variant": "#35343a",
+            "on-primary-fixed-variant": "#5a00c6",
+            "surface-container": "#1f1f24",
+            "on-secondary-fixed": "#001e2c",
+            "surface-container-low": "#1b1b20",
+            "inverse-surface": "#e4e1e9",
+            "primary-container": "#7c3aed",
+            "surface-container-high": "#2a292f",
+            "on-secondary-fixed-variant": "#004c69",
+            "on-primary-fixed": "#25005a",
+            "surface-tint": "#d2bbff",
+            "surface-container-highest": "#35343a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "gutter-desktop": "1.5rem",
+            "space-md": "1rem",
+            "margin-desktop": "2rem",
+            "margin": "1rem",
+            "space-xl": "2.25rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "label-md": ["Inter"],
+            "label-stats": ["JetBrains Mono"],
+            "display-lg-mobile": ["Inter"],
+            "headline-md": ["Inter"],
+            "caption": ["Inter"],
+            "body-ui": ["Inter"],
+            "math-display": ["EB Garamond"],
+            "display-lg": ["Inter"],
+            "body-ui-strong": ["Inter"],
+            "math-inline": ["EB Garamond"],
+            "headline-sm": ["Inter"]
+          },
+          "fontSize": {
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "label-stats": ["13px", { "lineHeight": "16px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "caption": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "400" }],
+            "body-ui": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "math-display": ["20px", { "lineHeight": "34px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-ui-strong": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+            "math-inline": ["17px", { "lineHeight": "28px", "fontWeight": "400" }],
+            "headline-sm": ["18px", { "lineHeight": "26px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .glass-card {
+      background: rgba(18, 18, 23, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(74, 68, 85, 0.45);
+    }
+    .glass-card-elevated {
+      background: rgba(26, 26, 36, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(124, 58, 237, 0.5);
+      box-shadow: 0 0 24px -4px rgba(124, 58, 237, 0.25), 0 8px 32px -4px rgba(0, 0, 0, 0.6);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 16px -2px rgba(123, 208, 255, 0.35);
+    }
+    .glow-violet {
+      box-shadow: 0 0 18px -2px rgba(124, 58, 237, 0.4);
+    }
+    .math-font {
+      font-family: 'EB Garamond', serif;
+    }
+    .mono-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+  .katex, .katex-display, .math-tex, .font-serif, .math-font, .font-math-inline, .font-math-display, [class*="math-"] {
+    font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Math', 'TeX Gyre Termes', 'STIX Two Text', 'Times New Roman', serif !important;
+  }
+  .katex .katex-html, .katex .mathnormal, .katex .mord, .katex .mbin, .katex .mrel, .katex .mopen, .katex .mclose, .katex .mpunct {
+    font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Math', 'TeX Gyre Termes', 'STIX Two Text', 'Times New Roman', serif !important;
+  }
+</style></head>
+<body class="bg-surface-container-lowest text-on-surface antialiased min-h-screen selection:bg-primary-container selection:text-on-primary-container">
+<!-- Main Mobile Frame Container -->
+<div class="max-w-[420px] mx-auto min-h-screen flex flex-col relative pb-28">
+<!-- Top Navigation Anchor (Shared Component: TopAppBar mapped to style guidelines) -->
+<header class="sticky top-0 z-40 bg-surface/85 backdrop-blur-md dark:bg-surface/85 shadow-sm">
+<div class="flex justify-between items-center w-full px-4 h-16 max-w-screen-md mx-auto">
+<!-- Leading: Brand Logo & User Indicator -->
+<div class="flex items-center gap-3">
+<div class="relative w-9 h-9 rounded-full bg-gradient-to-tr from-primary-container via-surface-variant to-secondary flex items-center justify-center p-[1px] shadow-sm">
+<div class="w-full h-full bg-surface-container-low rounded-full flex items-center justify-center">
+<span class="font-label-stats text-label-stats text-primary font-bold">AK</span>
+</div>
+<div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-tertiary rounded-full border-2 border-surface-container-lowest"></div>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm text-primary dark:text-primary font-bold tracking-tight">Euler</span>
+<span class="font-label-md text-label-md px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant">IMO</span>
+</div>
+</div>
+</div>
+<!-- Trailing Action: Elo & Master Pill -->
+<div class="flex items-center gap-2">
+<!-- Streak Indicator -->
+<div class="flex items-center gap-1 bg-surface-container px-2.5 py-1 rounded-full border border-outline-variant/30">
+<span class="material-symbols-outlined text-secondary text-[16px]" data-icon="local_fire_department" data-weight="fill" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-label-stats text-label-stats text-secondary">18d</span>
+</div>
+<!-- Master Elo Badge -->
+<div class="flex items-center gap-1.5 bg-gradient-to-r from-primary-container/20 to-secondary/10 px-3 py-1 rounded-full border border-primary/40 glow-violet">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+<span class="font-label-stats text-label-stats text-primary font-bold tracking-tight">2140 [Master]</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-4 pt-3 space-y-4">
+<!-- Candidate Subtitle Status Header -->
+<section class="glass-card rounded-xl p-3.5 border border-outline-variant/40 relative overflow-hidden">
+<div class="absolute -right-12 -top-12 w-32 h-32 bg-primary-container/20 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex justify-between items-center relative z-10">
+<div>
+<p class="font-caption text-caption text-secondary font-medium tracking-wide">COMPETITIVE OLYMPIAD RATING</p>
+<div class="flex items-baseline gap-2 mt-0.5">
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-on-surface font-extrabold tracking-tight">2,142 <span class="font-label-stats text-label-stats text-tertiary font-semibold">+18 pts</span></h2>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant">International Master Candidate (Top 1.2%)</p>
+</div>
+<div class="text-right">
+<div class="w-11 h-11 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant/50 ml-auto">
+<span class="material-symbols-outlined text-primary text-[24px]" data-icon="military_tech">military_tech</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Stats Grid (Bento mini glass cards) -->
+<section class="grid grid-cols-2 gap-2.5">
+<!-- Card 1: Solved -->
+<div class="glass-card rounded-xl p-3 border border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="font-caption text-caption text-on-surface-variant block">Solved</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold mono-font">348</span>
+<span class="font-caption text-caption text-tertiary block mt-0.5">IMO/USAMO Tier</span>
+</div>
+<div class="p-2 rounded-lg bg-surface-container text-secondary">
+<span class="material-symbols-outlined text-[20px]" data-icon="task_alt">task_alt</span>
+</div>
+</div>
+<!-- Card 2: Accuracy -->
+<div class="glass-card rounded-xl p-3 border border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="font-caption text-caption text-on-surface-variant block">Accuracy</span>
+<span class="font-headline-sm text-headline-sm text-secondary font-bold mono-font">78.4%</span>
+<span class="font-caption text-caption text-on-surface-variant block mt-0.5">Proof Validated</span>
+</div>
+<div class="p-2 rounded-lg bg-surface-container text-secondary">
+<span class="material-symbols-outlined text-[20px]" data-icon="verified">verified</span>
+</div>
+</div>
+<!-- Card 3: Solve Time -->
+<div class="glass-card rounded-xl p-3 border border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="font-caption text-caption text-on-surface-variant block">Avg. Solve Time</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold mono-font">14m 20s</span>
+<span class="font-caption text-caption text-tertiary block mt-0.5">-2m 15s this week</span>
+</div>
+<div class="p-2 rounded-lg bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[20px]" data-icon="timer">timer</span>
+</div>
+</div>
+<!-- Card 4: Contest Ready -->
+<div class="glass-card rounded-xl p-3 border border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="font-caption text-caption text-on-surface-variant block">Contest Ready</span>
+<span class="font-headline-sm text-headline-sm text-tertiary font-bold mono-font">92%</span>
+<span class="font-caption text-caption text-secondary block mt-0.5">EGMO / BMO Target</span>
+</div>
+<div class="p-2 rounded-lg bg-surface-container text-tertiary">
+<span class="material-symbols-outlined text-[20px]" data-icon="bolt">bolt</span>
+</div>
+</div>
+</section>
+<!-- Resume Last Topic Highlight Action Card -->
+<section class="glass-card-elevated rounded-xl p-4 relative overflow-hidden">
+<div class="absolute -top-10 -right-10 w-28 h-28 bg-primary-container/30 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-center justify-between mb-2">
+<span class="px-2 py-0.5 rounded bg-primary-container/30 border border-primary/40 font-caption text-caption text-primary font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+            ACTIVE SESSION
+          </span>
+<span class="font-label-stats text-label-stats text-on-surface-variant">P4 / 7 Complete</span>
+</div>
+<h3 class="font-body-ui-strong text-body-ui-strong text-on-surface tracking-tight">Analytic Number Theory</h3>
+<p class="font-caption text-caption text-secondary mt-0.5">Diophantine Approximation &amp; Dirichlet's Lemma</p>
+<!-- LaTeX Proof Teaser Container -->
+<div class="mt-3 p-3 rounded-lg bg-surface-container-lowest/90 border border-outline-variant/40">
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-caption text-caption text-outline font-medium">Problem Stem Preview</span>
+<span class="font-label-stats text-label-stats text-tertiary">Tier IV</span>
+</div>
+<p class="font-math-inline text-math-inline text-on-surface leading-relaxed">
+            Prove that for every irrational <span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal" style="margin-right: 0.0037em;">α</span></span></span></span></span>, there exist infinitely many pairs of coprime integers <span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>p</mi><mo separator="true">,</mo><mi>q</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(p, q)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mpunct">,</span><span class="mspace" style="margin-right: 0.1667em;"></span><span class="mord mathnormal" style="margin-right: 0.0359em;">q</span><span class="mclose">)</span></span></span></span></span> with <span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">q &gt; 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.7335em; vertical-align: -0.1944em;"></span><span class="mord mathnormal" style="margin-right: 0.0359em;">q</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 0.6444em;"></span><span class="mord">0</span></span></span></span></span> such that <span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∣</mi><mi>α</mi><mo>−</mo><mi>p</mi><mi mathvariant="normal">/</mi><mi>q</mi><mi mathvariant="normal">∣</mi><mo>&lt;</mo><mfrac><mn>1</mn><mrow><msqrt><mn>5</mn></msqrt><msup><mi>q</mi><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">|\alpha - p/q| &lt; \frac{1}{\sqrt{5} q^2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right: 0.0037em;">α</span><span class="mspace" style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right: 0.2222em;"></span></span><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal">p</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right: 0.0359em;">q</span><span class="mord">∣</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 1.4302em; vertical-align: -0.5851em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.8451em;"><span class="" style="top: -2.551em;"><span class="pstrut" style="height: 3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.9128em;"><span class="svg-align" style="top: -3em;"><span class="pstrut" style="height: 3em;"></span><span class="mord mtight" style="padding-left: 0.833em;"><span class="mord mtight">5</span></span></span><span class="" style="top: -2.8728em;"><span class="pstrut" style="height: 3em;"></span><span class="hide-tail mtight" style="min-width: 0.853em; height: 1.08em;"><svg width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z"></path></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.1272em;"><span class=""></span></span></span></span></span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right: 0.0359em;">q</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height: 0.7463em;"><span class="" style="top: -2.786em; margin-right: 0.0714em;"><span class="pstrut" style="height: 2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span><span class="" style="top: -3.23em;"><span class="pstrut" style="height: 3em;"></span><span class="frac-line" style="border-bottom-width: 0.04em;"></span></span><span class="" style="top: -3.394em;"><span class="pstrut" style="height: 3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.5851em;"><span class=""></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>.
+          </p>
+</div>
+<!-- Progress Bar -->
+<div class="mt-3.5 space-y-1.5">
+<div class="flex justify-between items-center font-caption text-caption text-on-surface-variant">
+<span class="">Section Completion</span>
+<span class="font-label-stats text-label-stats text-primary">57%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary-container to-secondary rounded-full" style="width: 57%;"></div>
+</div>
+</div>
+<!-- Action Button -->
+<button class="mt-4 w-full h-[44px] rounded-lg bg-primary-container hover:bg-inverse-primary active:scale-95 transition-all text-on-primary-container font-body-ui-strong text-body-ui-strong flex items-center justify-center gap-2 shadow-lg glow-violet">
+<span class="">Continue Practice</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</section>
+<!-- Olympiad Mastery Radar & Skill Breakdown -->
+<section class="glass-card rounded-xl p-4 border border-outline-variant/40">
+<div class="flex items-center justify-between mb-2">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Olympiad Domain Mastery</h3>
+<p class="font-caption text-caption text-on-surface-variant">4 Core International Mathematical Olympiad Pillars</p>
+</div>
+<span class="font-label-stats text-label-stats text-secondary bg-surface-container px-2 py-1 rounded border border-outline-variant/40">Radar v2.4</span>
+</div>
+<!-- Radar Canvas / SVG Component -->
+<div class="relative w-full aspect-square max-w-[260px] mx-auto my-2 flex items-center justify-center">
+<svg class="w-full h-full" viewBox="0 0 300 300">
+<!-- Concentric Polygonal Grid Lines -->
+<polygon fill="none" points="150,30 270,150 150,270 30,150" stroke="#272738" stroke-width="1.2"></polygon>
+<polygon fill="none" points="150,60 240,150 150,240 60,150" stroke="#272738" stroke-width="1.2"></polygon>
+<polygon fill="none" points="150,90 210,150 150,210 90,150" stroke="#272738" stroke-width="1.2"></polygon>
+<polygon fill="none" points="150,120 180,150 150,180 120,150" stroke="#272738" stroke-width="1.2"></polygon>
+<!-- Axis Crosshairs -->
+<line stroke="#272738" stroke-dasharray="3,3" stroke-width="1" x1="150" x2="150" y1="30" y2="270"></line>
+<line stroke="#272738" stroke-dasharray="3,3" stroke-width="1" x1="30" x2="270" y1="150" y2="150"></line>
+<!-- Data Radar Polygon:
+                 Top: Algebra (88% -> y = 150 - (120 * 0.88) = 44.4) -> (150, 44)
+                 Right: Geometry (91% -> x = 150 + (120 * 0.91) = 259.2) -> (259, 150)
+                 Bottom: Combinatorics (64% -> y = 150 + (120 * 0.64) = 226.8) -> (150, 227)
+                 Left: Number Theory (79% -> x = 150 - (120 * 0.79) = 55.2) -> (55, 150)
+            -->
+<polygon class="drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]" fill="rgba(99, 102, 241, 0.28)" points="150,44 259,150 150,227 55,150" stroke="#38bdf8" stroke-width="2.2"></polygon>
+<!-- Data Vertices Nodes -->
+<circle cx="150" cy="44" fill="#7bd0ff" r="4.5" stroke="#131318" stroke-width="1.5"></circle>
+<circle cx="259" cy="150" fill="#7bd0ff" r="4.5" stroke="#131318" stroke-width="1.5"></circle>
+<circle cx="150" cy="227" fill="#7bd0ff" r="4.5" stroke="#131318" stroke-width="1.5"></circle>
+<circle cx="55" cy="150" fill="#7bd0ff" r="4.5" stroke="#131318" stroke-width="1.5"></circle>
+<!-- Labels -->
+<text fill="#e4e1e9" font-family="Inter" font-size="12" font-weight="600" text-anchor="middle" x="150" y="20">Algebra (88%)</text>
+<text fill="#e4e1e9" font-family="Inter" font-size="12" font-weight="600" text-anchor="start" x="272" y="154">Geometry (91%)</text>
+<text fill="#e4e1e9" font-family="Inter" font-size="12" font-weight="600" text-anchor="middle" x="150" y="292">Combinatorics (64%)</text>
+<text fill="#e4e1e9" font-family="Inter" font-size="12" font-weight="600" text-anchor="end" x="26" y="154">Number Theory (79%)</text>
+</svg>
+</div>
+<!-- Pillar Breakdown Badges -->
+<div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-outline-variant/30">
+<div class="bg-surface-container/60 p-2 rounded-lg border border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="font-caption text-caption text-on-surface-variant block">Geometry</span>
+<span class="font-label-stats text-label-stats text-tertiary font-bold">91% • Master</span>
+</div>
+<span class="material-symbols-outlined text-tertiary text-[18px]" data-icon="change_history">change_history</span>
+</div>
+<div class="bg-surface-container/60 p-2 rounded-lg border border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="font-caption text-caption text-on-surface-variant block">Algebra</span>
+<span class="font-label-stats text-label-stats text-secondary font-bold">88% • Expert</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px]" data-icon="functions">functions</span>
+</div>
+<div class="bg-surface-container/60 p-2 rounded-lg border border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="font-caption text-caption text-on-surface-variant block">Number Theory</span>
+<span class="font-label-stats text-label-stats text-primary font-bold">79% • Advanced</span>
+</div>
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="pin">pin</span>
+</div>
+<div class="bg-surface-container/60 p-2 rounded-lg border border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="font-caption text-caption text-on-surface-variant block">Combinatorics</span>
+<span class="font-label-stats text-label-stats text-on-surface-variant font-bold">64% • Intermediate</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="hub">hub</span>
+</div>
+</div>
+</section>
+<!-- Daily Problem of the Day Challenge Banner -->
+<section class="glass-card rounded-xl p-4 border border-outline-variant/40 relative overflow-hidden">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded bg-tertiary/10 border border-tertiary/30 font-caption text-caption text-tertiary font-medium">Daily Challenge</span>
+<span class="font-caption text-caption text-on-surface-variant">Resets in 06h 42m</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">IMO Shortlist 2021 C3</h3>
+<p class="font-caption text-caption text-on-surface-variant mt-0.5">Combinatorial Game Theory on Finite Grids</p>
+</div>
+<div class="bg-surface-container px-2.5 py-1.5 rounded-lg border border-outline-variant/40 text-center">
+<span class="font-caption text-caption text-outline block">Rating</span>
+<span class="font-label-stats text-label-stats text-error font-bold">2450</span>
+</div>
+</div>
+<div class="mt-3 flex items-center justify-between pt-2 border-t border-outline-variant/30">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]" data-icon="group">group</span>
+<span class="font-label-stats text-label-stats text-on-surface-variant">142 solves today</span>
+</div>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-variant active:scale-95 transition-all text-secondary font-label-md text-label-md flex items-center gap-1.5 border border-secondary/30 glow-cyan">
+<span class="">Attempt Proof</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Shared Component: BottomNavBar with exact classes & active state logic) -->
+<!-- Destination 0: Dashboard is active for this screen -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-4 bg-surface-container/90 backdrop-blur-xl dark:bg-surface-container/90 shadow-lg dark:shadow-black/50">
+<!-- Tab 1: Dashboard (ACTIVE MATCH) -->
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary font-medium relative after:content-[''] after:w-1 after:h-1 after:bg-secondary after:rounded-full after:mt-1 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined text-[22px]" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</button>
+<!-- Tab 2: Practice (INACTIVE) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95">
+<span class="material-symbols-outlined text-[22px]" data-icon="calculate">calculate</span>
+<span class="font-label-md text-label-md">Practice</span>
+</button>
+<!-- Tab 3: Theory (INACTIVE) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface dark:hover:text-on-surface transition-colors duration-200 active:scale-95">
+<span class="material-symbols-outlined text-[22px]" data-icon="menu_book">menu_book</span>
+<span class="font-label-md text-label-md">Theory</span>
+</button>
+</nav>
+</div>
+
+
+</body></html>

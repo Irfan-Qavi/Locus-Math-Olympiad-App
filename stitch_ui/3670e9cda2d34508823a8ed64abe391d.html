@@ -1,0 +1,415 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Euler - Olympiad Practice</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cmu-serif@5.0.8/index.css">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- KaTeX CDN & Auto-render extension -->
+<link href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" rel="stylesheet">
+<script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration Verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-bright": "#39393e",
+            "on-surface-variant": "#ccc3d8",
+            "outline": "#958da1",
+            "inverse-primary": "#732ee4",
+            "on-background": "#e4e1e9",
+            "tertiary-fixed": "#6ffbbe",
+            "on-error-container": "#ffdad6",
+            "tertiary-container": "#007650",
+            "surface": "#131318",
+            "on-surface": "#e4e1e9",
+            "error-container": "#93000a",
+            "secondary-fixed-dim": "#7bd0ff",
+            "on-primary": "#3f008e",
+            "on-primary-container": "#ede0ff",
+            "secondary-fixed": "#c4e7ff",
+            "on-tertiary-container": "#76ffc2",
+            "on-secondary-container": "#00374d",
+            "primary": "#d2bbff",
+            "surface-dim": "#131318",
+            "primary-fixed-dim": "#d2bbff",
+            "outline-variant": "#4a4455",
+            "on-error": "#690005",
+            "tertiary-fixed-dim": "#4edea3",
+            "on-secondary": "#00354a",
+            "inverse-on-surface": "#303035",
+            "surface-container-lowest": "#0e0e13",
+            "background": "#131318",
+            "error": "#ffb4ab",
+            "on-tertiary-fixed": "#002113",
+            "secondary-container": "#00a6e0",
+            "tertiary": "#4edea3",
+            "primary-fixed": "#eaddff",
+            "on-tertiary-fixed-variant": "#005236",
+            "secondary": "#7bd0ff",
+            "on-tertiary": "#003824",
+            "surface-variant": "#35343a",
+            "on-primary-fixed-variant": "#5a00c6",
+            "surface-container": "#1f1f24",
+            "on-secondary-fixed": "#001e2c",
+            "surface-container-low": "#1b1b20",
+            "inverse-surface": "#e4e1e9",
+            "primary-container": "#7c3aed",
+            "surface-container-high": "#2a292f",
+            "on-secondary-fixed-variant": "#004c69",
+            "on-primary-fixed": "#25005a",
+            "surface-tint": "#d2bbff",
+            "surface-container-highest": "#35343a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "gutter-desktop": "1.5rem",
+            "space-md": "1rem",
+            "margin-desktop": "2rem",
+            "margin": "1rem",
+            "space-xl": "2.25rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.5rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "label-md": ["Inter"],
+            "label-stats": ["JetBrains Mono"],
+            "display-lg-mobile": ["Inter"],
+            "headline-md": ["Inter"],
+            "caption": ["Inter"],
+            "body-ui": ["Inter"],
+            "math-display": ["EB Garamond", "KaTeX_Main", "Times New Roman", "serif"],
+            "display-lg": ["Inter"],
+            "body-ui-strong": ["Inter"],
+            "math-inline": ["EB Garamond", "KaTeX_Math", "Times New Roman", "serif"],
+            "headline-sm": ["Inter"]
+          },
+          "fontSize": {
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "label-stats": ["13px", { "lineHeight": "16px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "caption": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "400" }],
+            "body-ui": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "math-display": ["20px", { "lineHeight": "34px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-ui-strong": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+            "math-inline": ["17px", { "lineHeight": "28px", "fontWeight": "400" }],
+            "headline-sm": ["18px", { "lineHeight": "26px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    @import url('https://fonts.cdnfonts.com/css/computer-modern');
+
+    /* Custom glow and glassmorphism fine-tuning */
+    .violet-glow-subtle {
+      box-shadow: 0 0 25px -4px rgba(124, 58, 237, 0.22);
+    }
+    .violet-glow-btn {
+      box-shadow: 0 0 18px rgba(124, 58, 237, 0.45);
+    }
+    .cyan-glow-indicator {
+      box-shadow: 0 0 10px rgba(123, 208, 255, 0.5);
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* KaTeX Color & Styling Harmony */
+    .katex {
+      font-size: 1.08em;
+      line-height: 1.6;
+      color: inherit;
+    }
+    .katex-display {
+      margin: 0 !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 4px 0;
+    }
+    .math-accent-cyan .katex {
+      color: #7bd0ff;
+    }
+    .math-accent-purple .katex {
+      color: #d2bbff;
+    }
+    .math-block-container .katex-display > .katex {
+      color: #d2bbff;
+      font-size: 1.15em;
+    }
+    .math-block-container .katex-display > .katex .mord.mathnormal {
+      color: #e4e1e9;
+    }
+    .math-block-container .katex-display > .katex .mopen,
+    .math-block-container .katex-display > .katex .mclose,
+    .math-block-container .katex-display > .katex .mop {
+      color: #7bd0ff;
+    }
+
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+      function runKaTeX() {
+        if (window.renderMathInElement) {
+          renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+            ],
+            throwOnError: false
+          });
+        } else {
+          setTimeout(runKaTeX, 50);
+        }
+      }
+      runKaTeX();
+    });
+</script>
+<style id="cmu-math-fonts">
+  .font-math-display,
+  .font-math-inline,
+  .math-block-container,
+  .katex,
+  .katex-display,
+  .katex .katex-html,
+  .katex .mord,
+  .katex .mord.mathnormal,
+  .katex .mop,
+  .katex .mbin,
+  .katex .mrel,
+  .katex .mopen,
+  .katex .mclose,
+  .katex .mpunct,
+  .math-tex,
+  .font-serif {
+    font-family: 'CMU Serif', 'Computer Modern Serif', 'Latin Modern Math', 'TeX Gyre Termes', 'STIX Two Text', 'Times New Roman', serif !important;
+  }
+</style></head>
+<body class="bg-surface-container-lowest text-on-surface antialiased font-body-ui selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col justify-between items-center pb-24">
+<!-- Mobile Device Shell Simulation: 390px Max Width Container -->
+<div class="w-full max-w-[390px] min-h-screen flex flex-col bg-surface-container-lowest relative overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-40 bg-surface/85 backdrop-blur-md shadow-sm">
+<div class="flex items-center justify-between px-3.5 h-16 w-full">
+<!-- Back Navigation & Breadcrumb -->
+<div class="flex items-center gap-2 overflow-hidden mr-2">
+<button aria-label="Go back" class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+</button>
+<div class="flex flex-col min-w-0">
+<span class="font-caption text-caption text-secondary uppercase tracking-widest text-[9px] font-semibold">Olympiad Arena</span>
+<span class="font-body-ui-strong text-[12px] leading-tight text-on-surface truncate max-w-[145px]">Combinatorics &amp; Extremal</span>
+</div>
+</div>
+<!-- Timer & Master Elo Badge -->
+<div class="flex items-center gap-2 shrink-0">
+<!-- Session Timer with live pulse -->
+<div class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-surface-container border border-outline-variant/40">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse shadow-[0_0_8px_#4edea3]"></span>
+<span class="font-label-stats text-[11px] text-on-surface tracking-tight">12:45</span>
+</div>
+<!-- Master Elo Badge -->
+<div class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high border border-primary/30 text-primary">
+<span class="material-symbols-outlined text-[13px] text-primary" data-weight="fill" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<span class="font-label-stats text-[11px] font-semibold tracking-tight">2140 [Master]</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Problem Content Canvas -->
+<main class="flex-1 px-3.5 pt-3 space-y-4">
+<!-- Olympiad Problem Container (Dynamic Height Card) -->
+<section class="rounded-xl bg-surface/85 backdrop-blur-md border border-primary/30 p-4 violet-glow-subtle transition-all">
+<!-- Header Metadata -->
+<div class="flex items-center justify-between pb-3 mb-3 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-primary-container text-on-primary-container font-label-stats text-[11px] uppercase tracking-wider font-semibold">Problem #89</span>
+<span class="font-caption text-caption text-on-surface-variant text-[11px] tracking-tight">Tier III</span>
+</div>
+<!-- Difficulty Rating Stars & Bookmark -->
+<div class="flex items-center gap-1 text-secondary">
+<div class="flex items-center" title="Tier III Difficulty">
+<span class="material-symbols-outlined text-[15px] fill-current" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px] fill-current" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px] fill-current" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px] fill-current" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[15px] text-outline-variant">star</span>
+</div>
+<button aria-label="Bookmark problem" class="ml-1 text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">bookmark_border</span>
+</button>
+</div>
+</div>
+<!-- Contest Context Header -->
+<p class="font-caption text-caption text-primary/80 mb-2 font-medium tracking-wide">
+          International Olympiad Training • Tier III
+        </p>
+<!-- Problem Statement (CMU Serif / KaTeX with 1.65x Line Height) -->
+<div class="font-math-display text-math-display text-on-surface leading-[1.65] text-[18px]">
+          Let <span class="math-accent-cyan font-semibold"><span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mo>=</mo><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mi>E</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">G = (V, E)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6833em;"></span><span class="mord mathnormal">G</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right: 0.2222em;">V</span><span class="mpunct">,</span><span class="mspace" style="margin-right: 0.1667em;"></span><span class="mord mathnormal" style="margin-right: 0.0576em;">E</span><span class="mclose">)</span></span></span></span></span></span> be a connected simple graph with <span class="math-accent-cyan font-semibold"><span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>≥</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">n \ge 4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.7719em; vertical-align: -0.136em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 0.6444em;"></span><span class="mord">4</span></span></span></span></span></span> vertices. Suppose for every partition of the vertex set <span class="italic"><span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mi>A</mi><mo>∪</mo><mi>B</mi></mrow><annotation encoding="application/x-tex">V = A \cup B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6833em;"></span><span class="mord mathnormal" style="margin-right: 0.2222em;">V</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right: 0.2222em;"></span><span class="mbin">∪</span><span class="mspace" style="margin-right: 0.2222em;"></span></span><span class="base"><span class="strut" style="height: 0.6833em;"></span><span class="mord mathnormal" style="margin-right: 0.0502em;">B</span></span></span></span></span></span> into two non-empty disjoint subsets, the number of crossing edges <span class="font-semibold text-primary"><span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>A</mi><mo separator="true">,</mo><mi>B</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">e(A, B)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal">e</span><span class="mopen">(</span><span class="mord mathnormal">A</span><span class="mpunct">,</span><span class="mspace" style="margin-right: 0.1667em;"></span><span class="mord mathnormal" style="margin-right: 0.0502em;">B</span><span class="mclose">)</span></span></span></span></span></span> satisfies:
+        </div>
+<!-- High-Impact Block Equation with generous 20px+ vertical padding & dynamic height -->
+<div class="my-5 py-6 px-3 rounded-lg bg-surface-container-lowest/80 border border-outline-variant/30 flex items-center justify-center text-center overflow-x-auto no-scrollbar math-block-container">
+<div class="text-[20px] text-primary tracking-wide leading-relaxed inline-block select-all">
+          <span class=""><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>e</mi><mo stretchy="false">(</mo><mi>A</mi><mo separator="true">,</mo><mi>B</mi><mo stretchy="false">)</mo><mo>≥</mo><mrow><mo fence="true">⌈</mo><mfrac><mrow><mi mathvariant="normal">∣</mi><mi>A</mi><mi mathvariant="normal">∣</mi><mo>⋅</mo><mi mathvariant="normal">∣</mi><mi>B</mi><mi mathvariant="normal">∣</mi></mrow><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></mfrac><mo fence="true">⌉</mo></mrow><mo>+</mo><munder><mo>∑</mo><mrow><mi>v</mi><mo>∈</mo><mi>A</mi></mrow></munder><mi mathvariant="normal">deg</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo><mspace></mspace><mspace width="1em"></mspace><mo stretchy="false">(</mo><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow><mspace width="0.3333em"></mspace><mn>2</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">e(A, B) \ge \left\lceil \frac{|A| \cdot |B|}{n - 1} \right\rceil + \sum_{v \in A} \operatorname{deg}(v) \pmod 2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal">e</span><span class="mopen">(</span><span class="mord mathnormal">A</span><span class="mpunct">,</span><span class="mspace" style="margin-right: 0.1667em;"></span><span class="mord mathnormal" style="margin-right: 0.0502em;">B</span><span class="mclose">)</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 2.4em; vertical-align: -0.95em;"></span><span class="minner"><span class="mopen delimcenter" style="top: 0em;"><span class="delimsizing size3">⌈</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 1.427em;"><span class="" style="top: -2.314em;"><span class="pstrut" style="height: 3em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="mspace" style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right: 0.2222em;"></span><span class="mord">1</span></span></span><span class="" style="top: -3.23em;"><span class="pstrut" style="height: 3em;"></span><span class="frac-line" style="border-bottom-width: 0.04em;"></span></span><span class="" style="top: -3.677em;"><span class="pstrut" style="height: 3em;"></span><span class="mord"><span class="mord">∣</span><span class="mord mathnormal">A</span><span class="mord">∣</span><span class="mspace" style="margin-right: 0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right: 0.2222em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right: 0.0502em;">B</span><span class="mord">∣</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.7693em;"><span class=""></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose delimcenter" style="top: 0em;"><span class="delimsizing size3">⌉</span></span></span><span class="mspace" style="margin-right: 0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right: 0.2222em;"></span></span><span class="base"><span class="strut" style="height: 2.3717em; vertical-align: -1.3217em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 1.05em;"><span class="" style="top: -1.8557em; margin-left: 0em;"><span class="pstrut" style="height: 3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right: 0.0359em;">v</span><span class="mrel mtight">∈</span><span class="mord mathnormal mtight">A</span></span></span></span><span class="" style="top: -3.05em;"><span class="pstrut" style="height: 3.05em;"></span><span class=""><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 1.3217em;"><span class=""></span></span></span></span></span><span class="mspace" style="margin-right: 0.1667em;"></span><span class="mop"><span class="mord mathrm" style="margin-right: 0.0139em;">deg</span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right: 0.0359em;">v</span><span class="mclose">)</span><span class="mspace allowbreak"></span><span class="mspace" style="margin-right: 1em;"></span></span><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right: 0.3333em;"></span><span class="mord">2</span><span class="mclose">)</span></span></span></span></span></span>
+        </div>
+</div>
+<!-- Problem Sub-question -->
+<div class="font-math-display text-math-display text-on-surface leading-[1.65] text-[18px] pt-1">
+          Determine the minimum possible chromatic number <span class="math-accent-cyan font-semibold"><span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>χ</mi><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\chi(G)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal">χ</span><span class="mopen">(</span><span class="mord mathnormal">G</span><span class="mclose">)</span></span></span></span></span></span> across all such graphs.
+        </div>
+</section>
+<!-- Progressive Hint Accordion Section -->
+<section class="space-y-2.5">
+<!-- Hint 1: Unlocked State with Neon Cyan Left Border Accent -->
+<div class="rounded-lg bg-surface-container/70 border-l-[3px] border-l-secondary border-r border-y border-outline-variant/30 p-3.5 transition-all">
+<div class="flex items-center justify-between mb-1.5">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[17px]">lightbulb</span>
+<span class="font-label-md text-label-md text-secondary font-semibold">Hint 1 • Conceptual Direction</span>
+</div>
+<span class="font-caption text-caption text-tertiary flex items-center gap-0.5 text-[10px] font-semibold">
+<span class="material-symbols-outlined text-[13px]">check_circle</span> UNLOCKED
+            </span>
+</div>
+<p class="font-math-inline text-[16px] text-on-surface/90 leading-[1.6]">
+            Consider the parity of the degree sum over <span class="math-accent-cyan"><span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></span></span> and examine the case where <span class="math-accent-cyan"><span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi></mrow><annotation encoding="application/x-tex">G</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6833em;"></span><span class="mord mathnormal">G</span></span></span></span></span></span> contains an Eulerian sub-graph.
+          </p>
+</div>
+<!-- Hint 2: Locked State Button -->
+<button class="w-full text-left rounded-lg bg-surface-container-low/60 border border-dashed border-outline-variant/60 p-3 flex items-center justify-between hover:bg-surface-container transition-all active:scale-[0.99] group" type="button">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center text-outline group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+</div>
+<div>
+<span class="font-body-ui-strong text-[13px] text-on-surface block leading-tight">Reveal Hint 2: Key Lemma</span>
+<span class="font-caption text-[11px] text-on-surface-variant">Deduction cost applies to leaderboard</span>
+</div>
+</div>
+<span class="font-label-stats text-[11px] px-2 py-1 rounded bg-error-container/40 text-error border border-error/20 flex items-center gap-1">
+            -10 Elo
+          </span>
+</button>
+</section>
+<!-- Mathematical Solution Input Area -->
+<section class="rounded-xl bg-surface-container-low border border-outline-variant/40 p-3.5 space-y-3">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface-variant font-semibold uppercase tracking-wider flex items-center gap-1.5" for="math-input">
+<span class="material-symbols-outlined text-[15px] text-primary">edit_note</span> Candidate Evaluation
+          </label>
+<span class="font-caption text-caption text-outline">Real-time LaTeX</span>
+</div>
+<!-- Formula Input Box -->
+<div class="relative rounded-lg bg-surface-container-lowest border border-primary/50 p-3 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary shadow-inner">
+<div class="flex items-center justify-between">
+<div class="font-math-display text-[20px] text-primary flex items-center gap-1.5 tracking-wide">
+<span class="math-accent-cyan font-semibold"><span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>χ</mi><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo><mo>=</mo></mrow><annotation encoding="application/x-tex">\chi(G) =</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal">χ</span><span class="mopen">(</span><span class="mord mathnormal">G</span><span class="mclose">)</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">=</span></span></span></span></span></span>
+<span class="text-on-surface font-semibold text-[22px] px-0.5" id="math-input">3</span>
+<span class="w-0.5 h-6 bg-primary animate-pulse ml-0.5"></span>
+</div>
+<button aria-label="Clear solution input" class="p-1 rounded text-outline hover:text-on-surface active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[17px]">backspace</span>
+</button>
+</div>
+</div>
+<!-- Quick Symbol Touch Utility Toolbar -->
+<div>
+<span class="font-caption text-[10px] text-outline uppercase tracking-wider block mb-1.5">Quick Syntax Keys</span>
+<div class="grid grid-cols-4 gap-1.5">
+<button class="h-9 rounded bg-surface-container border border-outline-variant/30 text-secondary font-math-inline text-[14px] hover:border-primary/50 active:scale-95 transition-all" type="button">
+              <span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>χ</mi><mo stretchy="false">(</mo><mi>G</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\chi(G)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal">χ</span><span class="mopen">(</span><span class="mord mathnormal">G</span><span class="mclose">)</span></span></span></span></span>
+            </button>
+<button class="h-9 rounded bg-surface-container border border-outline-variant/30 text-on-surface font-math-inline text-[14px] hover:border-primary/50 active:scale-95 transition-all" type="button">
+              <span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">deg</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>v</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\operatorname{deg}(v)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mop"><span class="mord mathrm" style="margin-right: 0.0139em;">deg</span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right: 0.0359em;">v</span><span class="mclose">)</span></span></span></span></span>
+            </button>
+<button class="h-9 rounded bg-surface-container border border-outline-variant/30 text-on-surface font-label-stats text-[12px] hover:border-primary/50 active:scale-95 transition-all" type="button">
+              <span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow> <mo lspace="0.22em" rspace="0.22em"><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">d</mi></mrow></mo> </mrow><annotation encoding="application/x-tex">\bmod</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6944em;"></span><span class="mspace" style="margin-right: 0.0556em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">mod</span></span></span><span class="mspace" style="margin-right: 0.0556em;"></span></span></span></span></span>
+            </button>
+<button class="h-9 rounded bg-surface-container border border-outline-variant/30 text-on-surface font-math-inline text-[15px] hover:border-primary/50 active:scale-95 transition-all" type="button">
+              <span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">⌈</mo><mi>x</mi><mo stretchy="false">⌉</mo></mrow><annotation encoding="application/x-tex">\lceil x \rceil</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mopen">⌈</span><span class="mord mathnormal">x</span><span class="mclose">⌉</span></span></span></span></span>
+            </button>
+<button class="h-9 rounded bg-surface-container border border-outline-variant/30 text-on-surface font-math-inline text-[15px] hover:border-primary/50 active:scale-95 transition-all" type="button">
+              <span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≤</mo></mrow><annotation encoding="application/x-tex">\le</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.7719em; vertical-align: -0.136em;"></span><span class="mrel">≤</span></span></span></span></span>
+            </button>
+<button class="h-9 rounded bg-surface-container border border-outline-variant/30 text-on-surface font-math-inline text-[15px] hover:border-primary/50 active:scale-95 transition-all" type="button">
+              <span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≥</mo></mrow><annotation encoding="application/x-tex">\ge</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.7719em; vertical-align: -0.136em;"></span><span class="mrel">≥</span></span></span></span></span>
+            </button>
+<button class="h-9 rounded bg-surface-container border border-outline-variant/30 text-on-surface font-math-inline text-[16px] hover:border-primary/50 active:scale-95 transition-all" type="button">
+              <span class=""><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∞</mi></mrow><annotation encoding="application/x-tex">\infty</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord">∞</span></span></span></span></span>
+            </button>
+<button class="h-9 rounded bg-surface-container-high border border-outline-variant/40 text-outline-variant hover:text-on-surface font-label-stats text-[11px] uppercase tracking-wider active:scale-95 transition-all" type="button">
+              Clear
+            </button>
+</div>
+</div>
+</section>
+<!-- Solution Submission CTA Cluster -->
+<section class="space-y-2 pt-1 pb-4">
+<!-- Primary Action Button: Electric Violet Glowing CTA -->
+<button class="w-full h-11 rounded-lg bg-primary-container text-white font-body-ui-strong text-[14px] flex items-center justify-center gap-2 violet-glow-btn hover:brightness-110 active:scale-[0.98] transition-all" type="button">
+<span class="material-symbols-outlined text-[19px]">verified</span>
+          Submit Verification
+        </button>
+<!-- Secondary Actions Grid -->
+<div class="grid grid-cols-2 gap-2">
+<button class="h-10 rounded-lg bg-surface-container border border-outline-variant/40 text-on-surface font-body-ui text-[13px] flex items-center justify-center gap-1.5 hover:bg-surface-container-high active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[17px] text-secondary">draw</span>
+            Open Scratchpad
+          </button>
+<button class="h-10 rounded-lg bg-surface-container border border-outline-variant/40 text-on-surface-variant hover:text-on-surface font-body-ui text-[13px] flex items-center justify-center gap-1.5 hover:bg-surface-container-high active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[17px]">redo</span>
+            Skip Problem
+          </button>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Shared Component Execution) -->
+<!-- Destination count = 3, Active item = 'Practice' (Exact intent match) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-4 bg-surface-container/90 backdrop-blur-xl shadow-lg dark:shadow-black/50">
+<!-- Tab 1: Dashboard (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150 py-1" href="#dashboard">
+<span class="material-symbols-outlined text-[22px]">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<!-- Tab 2: Practice (Active Destination: Cyan Glyph + Miniature Glowing Dot Anchor) -->
+<a class="flex flex-col items-center justify-center text-secondary font-medium relative after:content-[''] after:w-1 after:h-1 after:bg-secondary after:rounded-full after:mt-1 active:scale-95 transition-transform duration-150 py-1" href="#practice">
+<span class="material-symbols-outlined text-[22px] cyan-glow-indicator" data-weight="fill" style="font-variation-settings: 'FILL' 1;">calculate</span>
+<span class="font-label-md text-label-md text-secondary">Practice</span>
+</a>
+<!-- Tab 3: Theory (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors duration-200 active:scale-95 transition-transform duration-150 py-1" href="#theory">
+<span class="material-symbols-outlined text-[22px]">menu_book</span>
+<span class="font-label-md text-label-md">Theory</span>
+</a>
+</nav>
+</div>
+
+
+</body></html>
