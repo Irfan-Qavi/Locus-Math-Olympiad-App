@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <!-- Top AppBar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="16dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Go back"
+                android:src="@android:drawable/ic_menu_revert"
+                app:tint="@color/on_surface_variant" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvArenaSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OLYMPIAD ARENA"
+                    android:textColor="@color/secondary"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTopicTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Combinatorics &amp; Extremal"
+                    android:textColor="@color/on_surface"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvEloBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:background="@drawable/badge_rounded_violet"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="1000 [Master]"
+                android:textColor="@color/primary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Problem Card with Dynamic KaTeX WebView -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardProblem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/surface_container_lowest"
+                app:cardCornerRadius="12dp"
+                app:strokeColor="@color/outline_variant"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvProblemTag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@color/primary_container"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="2dp"
+                            android:text="PROBLEM #1"
+                            android:textColor="@color/on_primary_container"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvProblemTier"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="Tier III"
+                            android:textColor="@color/on_surface_variant"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <!-- Dynamically Resizing KaTeX WebView (CMU Serif) -->
+                    <com.locus.olympiad.ui.math.KatexWebView
+                        android:id="@+id/webViewProblemMath"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Progressive Hints Container -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="PROGRESSIVE HINT SYSTEM"
+                android:textColor="@color/secondary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <!-- Dynamic list of revealed hints -->
+            <LinearLayout
+                android:id="@+id/containerRevealedHints"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- Reveal Next Hint Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRevealHint"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:text="Reveal Hint 1 • Conceptual Direction"
+                android:textColor="@color/secondary"
+                app:strokeColor="@color/outline_variant" />
+
+            <!-- AI Tutor Diagnostic Stepping Stone (Appears on Hard-Stuck Trigger) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAiTutorHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="#1A1528"
+                app:cardCornerRadius="12dp"
+                app:strokeColor="@color/primary"
+                app:strokeWidth="1.5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="EULER AI TUTOR • STEPPING STONE"
+                            android:textColor="@color/primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <ProgressBar
+                            android:id="@+id/progressAiTutor"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginStart="8dp"
+                            android:indeterminate="true"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvAiTutorHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:lineSpacingMultiplier="1.4"
+                        android:textColor="@color/on_surface"
+                        android:textSize="14sp"
+                        tools:text="Consider examining whether the degree parity of vertex subset A forces an Eulerian subgraph." />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Candidate Evaluation Input Box -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="CANDIDATE EVALUATION"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilAnswerInput"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Solution / Value"
+                app:boxBackgroundColor="@color/surface_container_lowest"
+                app:boxStrokeColor="@color/primary"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etAnswer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="serif"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@color/primary"
+                    android:textSize="18sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Quick Syntax Touch Keys -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="4dp"
+                android:text="QUICK SYNTAX KEYS"
+                android:textColor="@color/outline"
+                android:textSize="10sp" />
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="4"
+                android:rowCount="2">
+
+                <Button
+                    android:id="@+id/btnKey1"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="2dp"
+                    android:text="χ(G)"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btnKey2"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="2dp"
+                    android:text="deg(v)"
+                    android:textSize="11sp" />
+
+                <Button
+                    android:id="@+id/btnKey3"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="2dp"
+                    android:text="mod 2"
+                    android:textSize="11sp" />
+
+                <Button
+                    android:id="@+id/btnKey4"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="2dp"
+                    android:text="⌈x⌉"
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/btnKey5"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="2dp"
+                    android:text="≤"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnKey6"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="2dp"
+                    android:text="≥"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnKey7"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="2dp"
+                    android:text="∞"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnKeyClear"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="2dp"
+                    android:text="CLR"
+                    android:textColor="@color/error"
+                    android:textSize="11sp" />
+            </GridLayout>
+
+            <!-- Submit Verification CTA Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSubmitAnswer"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/primary_container"
+                android:text="Submit Verification"
+                android:textColor="@color/on_primary_container"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:cornerRadius="8dp" />
+
+            <!-- Feedback / Error display banner -->
+            <TextView
+                android:id="@+id/tvFeedback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <!-- Loading Spinner -->
+            <ProgressBar
+                android:id="@+id/progressLoading"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
