@@ -19,7 +19,11 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
+
+      - name: Setup Gradle 8.7
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
 
       - name: Configure local.properties
         run: |
@@ -32,8 +36,8 @@ jobs:
       - name: Ensure Gradle Wrapper
         run: |
           if [ ! -f "gradlew" ] || [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-            echo "Generating Gradle wrapper..."
-            gradle wrapper --gradle-version 8.5
+            echo "Generating Gradle wrapper with Gradle 8.7..."
+            gradle wrapper --gradle-version 8.7
           fi
           chmod +x gradlew
 
