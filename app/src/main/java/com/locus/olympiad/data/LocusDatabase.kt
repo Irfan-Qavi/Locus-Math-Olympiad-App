@@ -39,8 +39,9 @@ abstract class LocusDatabase : RoomDatabase() {
 
         fun getInstance(context: Context, scope: CoroutineScope = CoroutineScope(Dispatchers.IO)): LocusDatabase {
             return INSTANCE ?: synchronized(this) {
+                val appContext = context.applicationContext
                 val instance = Room.databaseBuilder(
-                    context.applicationContext,
+                    appContext,
                     LocusDatabase::class.java,
                     "locus_olympiad.db"
                 )
@@ -48,8 +49,8 @@ abstract class LocusDatabase : RoomDatabase() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
                         scope.launch {
-                            getInstance(context, scope).let { database ->
-                                DatabaseInitializer.seedDatabase(database)
+                            getInstance(appContext, scope).let { database ->
+                                DatabaseInitializer.seedDatabase(appContext, database)
                             }
                         }
                     }

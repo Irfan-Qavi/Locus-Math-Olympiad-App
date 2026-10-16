@@ -3,15 +3,21 @@ package com.locus.olympiad.ui.theory
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.locus.olympiad.LocusApplication
+import com.locus.olympiad.data.dao.TheoryModuleDao
 import com.locus.olympiad.databinding.ActivityTheoryBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class TheoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityTheoryBinding
+
+    @Inject
+    lateinit var theoryModuleDao: TheoryModuleDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,10 +30,9 @@ class TheoryActivity : AppCompatActivity() {
     }
 
     private fun loadDefaultTheory() {
-        val app = application as LocusApplication
         lifecycleScope.launch {
             val module = withContext(Dispatchers.IO) {
-                app.database.theoryModuleDao().getModulesByCategorySync("Combinatorics").firstOrNull()
+                theoryModuleDao.getModulesByCategorySync("Combinatorics").firstOrNull()
             }
             if (module != null) {
                 binding.tvTheoryTitle.text = module.title

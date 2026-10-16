@@ -6,13 +6,16 @@ import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.data.model.PracticeQuestion
 import com.locus.olympiad.domain.ai.AiTutorRepository
 import com.locus.olympiad.repository.MatchmakingRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PracticeViewModel(
+@HiltViewModel
+class PracticeViewModel @Inject constructor(
     private val matchmakingRepository: MatchmakingRepository,
     private val aiTutorRepository: AiTutorRepository
 ) : ViewModel() {

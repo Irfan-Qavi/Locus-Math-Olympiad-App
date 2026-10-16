@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_dashboard">
+
+    <fragment
+        android:id="@+id/nav_dashboard"
+        android:name="com.locus.olympiad.ui.dashboard.DashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/activity_dashboard">
+        <action
+            android:id="@+id/action_dashboard_to_practice"
+            app:destination="@id/nav_practice" />
+        <action
+            android:id="@+id/action_dashboard_to_theory"
+            app:destination="@id/nav_theory" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_practice"
+        android:name="com.locus.olympiad.ui.practice.PracticeFragment"
+        android:label="Practice"
+        tools:layout="@layout/activity_practice">
+        <argument
+            android:name="category"
+            android:defaultValue="Combinatorics"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_theory"
+        android:name="com.locus.olympiad.ui.theory.TheoryFragment"
+        android:label="Theory"
+        tools:layout="@layout/activity_theory" />
+
+</navigation>

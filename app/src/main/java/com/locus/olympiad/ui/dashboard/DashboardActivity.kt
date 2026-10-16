@@ -7,20 +7,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.locus.olympiad.LocusApplication
 import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.databinding.ActivityDashboardBinding
 import com.locus.olympiad.ui.practice.PracticeActivity
 import com.locus.olympiad.ui.theory.TheoryActivity
 import com.locus.olympiad.viewmodel.DashboardViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDashboardBinding
-    private val viewModel: DashboardViewModel by viewModels {
-        (application as LocusApplication).viewModelFactory
-    }
+    private val viewModel: DashboardViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

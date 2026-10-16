@@ -17,14 +17,14 @@ import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.databinding.ActivityPracticeBinding
 import com.locus.olympiad.viewmodel.PracticeUiState
 import com.locus.olympiad.viewmodel.PracticeViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class PracticeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPracticeBinding
-    private val viewModel: PracticeViewModel by viewModels {
-        (application as LocusApplication).viewModelFactory
-    }
+    private val viewModel: PracticeViewModel by viewModels()
 
     private var currentRenderedQuestionId: Long? = null
 
