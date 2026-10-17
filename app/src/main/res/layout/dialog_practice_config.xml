@@ -9,213 +9,222 @@
     app:strokeColor="@color/outline_variant"
     app:strokeWidth="1dp">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollConfigContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:fillViewport="true"
+        android:overScrollMode="ifContentScrolls"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Header -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:letterSpacing="0.08"
-            android:text="PRACTICE CONFIGURATOR"
-            android:textColor="@color/primary"
-            android:textSize="12sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Tailor Your Training Session"
-            android:textColor="@color/on_surface"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <!-- 1. Topic Selection -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="6dp"
-            android:text="TOPIC SELECTION"
-            android:textColor="@color/on_surface_variant"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chipGroupTopic"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:selectionRequired="true"
-            app:singleSelection="true">
+            android:orientation="vertical"
+            android:padding="24dp">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipTopicAll"
-                style="@style/Widget.Material3.Chip.Filter"
+            <!-- Header -->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="MIX ALL TYPES" />
+                android:letterSpacing="0.08"
+                android:text="PRACTICE CONFIGURATOR"
+                android:textColor="@color/primary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipTopicCombinatorics"
-                style="@style/Widget.Material3.Chip.Filter"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Combinatorics" />
+                android:layout_marginTop="4dp"
+                android:text="Tailor Your Training Session"
+                android:textColor="@color/on_surface"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipTopicAlgebra"
-                style="@style/Widget.Material3.Chip.Filter"
+            <!-- 1. Topic Selection -->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Algebra" />
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="TOPIC SELECTION"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipTopicNumberTheory"
-                style="@style/Widget.Material3.Chip.Filter"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupTopic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipTopicAll"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="MIX ALL TYPES" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipTopicCombinatorics"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Combinatorics" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipTopicAlgebra"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Algebra" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipTopicNumberTheory"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Number Theory" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipTopicGeometry"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Geometry" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <!-- 2. Difficulty Level -->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Number Theory" />
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="6dp"
+                android:text="DIFFICULTY LEVEL"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipTopicGeometry"
-                style="@style/Widget.Material3.Chip.Filter"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupDifficulty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipDiffAdaptive"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Adaptive (Elo Matched)" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipDiffFoundational"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Foundational (&lt; 1200)" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipDiffIntermediate"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Intermediate (1200 - 1500)" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipDiffOlympiad"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Olympiad Tier (1500+)" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipDiffAll"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All Difficulties" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <!-- 3. Question Count -->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Geometry" />
-        </com.google.android.material.chip.ChipGroup>
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="6dp"
+                android:text="SESSION LENGTH"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
-        <!-- 2. Difficulty Level -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="6dp"
-            android:text="DIFFICULTY LEVEL"
-            android:textColor="@color/on_surface_variant"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chipGroupDifficulty"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:selectionRequired="true"
-            app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipDiffAdaptive"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupCount"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Adaptive (Elo Matched)" />
+                app:selectionRequired="true"
+                app:singleSelection="true">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipDiffFoundational"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipCount5"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5 Problems" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipCount10"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="10 Problems" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipCount15"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="15 Problems" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipCountEndless"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Endless Practice ∞" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <!-- Zero Timers Notice -->
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Foundational (&lt; 1200)" />
+                android:layout_marginTop="16dp"
+                android:background="@drawable/badge_rounded_violet"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp"
+                android:text="✦ No Timers Policy: Deep mathematical insight takes uninterrupted focus. Practice sessions are completely timer-free."
+                android:textColor="@color/primary"
+                android:textSize="12sp" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipDiffIntermediate"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Intermediate (1200 - 1500)" />
+            <!-- Start Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStartConfiguredPractice"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="@color/primary_container"
+                android:text="Begin Practice Session"
+                android:textColor="@color/on_primary_container"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:cornerRadius="10dp" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipDiffOlympiad"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Olympiad Tier (1500+)" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipDiffAll"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="All Difficulties" />
-        </com.google.android.material.chip.ChipGroup>
-
-        <!-- 3. Question Count -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="6dp"
-            android:text="SESSION LENGTH"
-            android:textColor="@color/on_surface_variant"
-            android:textSize="11sp"
-            android:textStyle="bold" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chipGroupCount"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:selectionRequired="true"
-            app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipCount5"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="5 Problems" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipCount10"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="10 Problems" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipCount15"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="15 Problems" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipCountEndless"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Endless Practice ∞" />
-        </com.google.android.material.chip.ChipGroup>
-
-        <!-- Zero Timers Notice -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/badge_rounded_violet"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp"
-            android:text="✦ No Timers Policy: Deep mathematical insight takes uninterrupted focus. Practice sessions are completely timer-free."
-            android:textColor="@color/primary"
-            android:textSize="12sp" />
-
-        <!-- Start Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnStartConfiguredPractice"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="@color/primary_container"
-            android:text="Begin Practice Session"
-            android:textColor="@color/on_primary_container"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:cornerRadius="10dp" />
-
-    </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </com.google.android.material.card.MaterialCardView>

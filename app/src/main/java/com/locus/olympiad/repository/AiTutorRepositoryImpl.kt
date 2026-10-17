@@ -1,5 +1,6 @@
 package com.locus.olympiad.repository
 
+import com.google.code.gson.JsonParser
 import com.locus.olympiad.data.model.PracticeQuestion
 import com.locus.olympiad.domain.ai.AiTutorPromptBuilder
 import com.locus.olympiad.domain.ai.AiTutorRepository
@@ -65,25 +66,23 @@ class AiTutorRepositoryImpl(
             return@withContext Result.success(true)
         }
 
-        // 2. Build prompt for LLM semantic evaluation
+        // 2. Build prompt for LLM semantic evaluation with strict JSON schema
+        val systemPrompt = "You are evaluating high school Olympiad mathematics. You must mark the student's answer as CORRECT if it is mathematically and semantically equivalent to the expected answer, regardless of phrasing. For example, 'Such a configuration does not exist', '0 solutions', 'None', and 'Impossible' are all strictly equivalent. Return strictly a JSON object: {\"isCorrect\": true} or {\"isCorrect\": false}."
+
         val evaluationPrompt = """
-            You are an elite International Mathematical Olympiad jury grader.
-            Task: Evaluate whether the student's candidate answer is mathematically and semantically EQUIVALENT to the official answer key.
-            
+            Evaluate whether the student's candidate answer is mathematically and semantically equivalent to the official expected answer.
+
             Olympiad Problem Statement:
             ${question.latexContent}
-            
-            Official Canonical Answer:
+
+            Official Expected Answer:
             $trimmedCorrect
-            
+
             Student's Candidate Answer:
             $trimmedCandidate
-            
-            Instructions:
-            - Focus strictly on semantic and mathematical correctness.
-            - Accept phrasing synonyms (e.g. "not possible", "impossible", "no solutions exist", "none").
-            - Accept equivalent algebraic expressions or unsimplified forms if mathematically identical.
-            - Output strictly ONE WORD: "CORRECT" or "INCORRECT".
+
+            Return strictly a JSON object:
+            {"isCorrect": true} or {"isCorrect": false}
         """.trimIndent()
 
         try {
@@ -91,7 +90,7 @@ class AiTutorRepositoryImpl(
                 messages = listOf(
                     ChatMessage(
                         role = "system",
-                        content = "You are an expert Math Olympiad answer grader. Reply strictly with CORRECT or INCORRECT."
+                        content = systemPrompt
                     ),
                     ChatMessage(
                         role = "user",
@@ -102,10 +101,23 @@ class AiTutorRepositoryImpl(
 
             val response = apiService.getChatCompletion(request)
             if (response.isSuccessful) {
-                val verdict = response.body()?.choices?.firstOrNull()?.message?.content?.trim()?.uppercase()
-                if (verdict != null) {
-                    val isCorrect = verdict.contains("CORRECT") && !verdict.contains("INCORRECT")
-                    return@withContext Result.success(isCorrect)
+                val rawBody = response.body()?.choices?.firstOrNull()?.message?.content?.trim()
+                if (!rawBody.isNullOrBlank()) {
+                    val jsonCandidate = rawBody.substringAfter("{", "").let {
+                        if (it.isNotEmpty()) "{" + it.substringBeforeLast("}", "") + "}" else rawBody
+                    }
+                    try {
+                        val jsonObject = JsonParser.parseString(jsonCandidate).asJsonObject
+                        if (jsonObject.has("isCorrect")) {
+                            return@withContext Result.success(jsonObject.get("isCorrect").asBoolean)
+                        }
+                    } catch (_: Exception) {
+                        if (rawBody.contains("\"isCorrect\"\\s*:\\s*true".toRegex(RegexOption.IGNORE_CASE))) {
+                            return@withContext Result.success(true)
+                        } else if (rawBody.contains("\"isCorrect\"\\s*:\\s*false".toRegex(RegexOption.IGNORE_CASE))) {
+                            return@withContext Result.success(false)
+                        }
+                    }
                 }
             }
 
@@ -120,8 +132,13 @@ class AiTutorRepositoryImpl(
         val normCandidate = candidate.lowercase().replace("[^a-z0-9]".toRegex(), "")
         if (normCorrect == normCandidate) return true
 
-        val impossibilityPhrases = setOf("impossible", "notpossible", "nosolution", "nosolutions", "none", "empty")
-        if (normCorrect in impossibilityPhrases && normCandidate in impossibilityPhrases) {
+        val impossibilityKeywords = listOf(
+            "impossible", "notpossible", "nosolution", "nosolutions", "none", "empty",
+            "doesnotexist", "suchaconfigurationdoesnotexist", "notexist", "nonexistent", "0solutions"
+        )
+        val correctIsImpossible = impossibilityKeywords.any { normCorrect.contains(it) || it.contains(normCorrect) }
+        val candidateIsImpossible = impossibilityKeywords.any { normCandidate.contains(it) || it.contains(normCandidate) }
+        if (correctIsImpossible && candidateIsImpossible) {
             return true
         }
         return false

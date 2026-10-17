@@ -2,12 +2,15 @@ package com.locus.olympiad.ui.math
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 
 /**
  * JavaScript interface bridging HTML document scroll height calculation to Android layout parameters.
@@ -46,6 +49,25 @@ class KatexWebView @JvmOverloads constructor(
             cacheMode = WebSettings.LOAD_NO_CACHE
             defaultTextEncodingName = "UTF-8"
         }
+
+        // Configure Dark Mode support explicitly
+        val isNightMode = (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        if (isNightMode) {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                WebSettingsCompat.setForceDark(settings, WebSettingsCompat.FORCE_DARK_ON)
+            }
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
+                WebSettingsCompat.setForceDarkStrategy(
+                    settings,
+                    WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING
+                )
+            }
+        } else {
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                WebSettingsCompat.setForceDark(settings, WebSettingsCompat.FORCE_DARK_OFF)
+            }
+        }
+
         setBackgroundColor(Color.parseColor("#121212"))
         isVerticalScrollBarEnabled = false
         isHorizontalScrollBarEnabled = false
@@ -88,7 +110,10 @@ class KatexWebView @JvmOverloads constructor(
      */
     fun setLatexContent(latexContent: String) {
         val sanitized = sanitizeLatexForHtml(latexContent)
-        val wrappedHtml = HTML_TEMPLATE.replace("{LATEX_CONTENT_PLACEHOLDER}", sanitized)
+        var wrappedHtml = HTML_TEMPLATE.replace("{LATEX_CONTENT_PLACEHOLDER}", sanitized).trim()
+        if (!wrappedHtml.startsWith("<!DOCTYPE html>", ignoreCase = true)) {
+            wrappedHtml = "<!DOCTYPE html>\n$wrappedHtml"
+        }
         loadDataWithBaseURL(
             "file:///android_asset/",
             wrappedHtml,
@@ -102,6 +127,7 @@ class KatexWebView @JvmOverloads constructor(
         private const val HTML_TEMPLATE = """<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
@@ -109,7 +135,8 @@ class KatexWebView @JvmOverloads constructor(
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dreampulse/computer-modern-web-font@master/fonts.css">
     <style>
         * { box-sizing: border-box; }
-        html, body {
+        body {
+            visibility: hidden;
             background-color: #121212;
             color: #FFFFFF;
             font-family: "Computer Modern Serif", serif !important;
@@ -119,6 +146,12 @@ class KatexWebView @JvmOverloads constructor(
             padding: 12px 14px 28px 14px;
             overflow-y: hidden;
             overflow-x: auto;
+        }
+        @media (prefers-color-scheme: dark) {
+            html, body {
+                background-color: #121212 !important;
+                color: #FFFFFF !important;
+            }
         }
         .katex {
             font-family: "Computer Modern Serif", serif !important;
@@ -151,31 +184,39 @@ class KatexWebView @JvmOverloads constructor(
             }
         }
 
+        function revealContent() {
+            document.body.style.visibility = "visible";
+            sendHeight();
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             renderMathInElement(document.body, {
                 delimiters: [
                     {left: "$$", right: "$$", display: true},
-                    {left: "\[", right: "\]", display: true},
+                    {left: "\\[", right: "\\]", display: true},
                     {left: "$", right: "$", display: false},
-                    {left: "\(", right: "\)", display: false}
+                    {left: "\\(", right: "\\)", display: false}
                 ],
                 throwOnError: false
             });
 
-            sendHeight();
-
             if (document.fonts && document.fonts.ready) {
                 document.fonts.ready.then(function() {
-                    sendHeight();
+                    revealContent();
                     setTimeout(sendHeight, 150);
+                }).catch(function() {
+                    revealContent();
                 });
             } else {
-                setTimeout(sendHeight, 300);
+                revealContent();
             }
+
+            // Fallback timeout to ensure visibility is never permanently blocked
+            setTimeout(revealContent, 600);
         });
 
         window.addEventListener("load", function() {
-            sendHeight();
+            revealContent();
         });
     </script>
 </body>
