@@ -5,19 +5,15 @@
   <i>Tailored for IOQM, RMO, INMO, and International Mathematical Olympiad (IMO) aspirants</i>
 </p>
 
----
-
-## 📐 Overview
+## Overview
 
 **Locus** (Euler IMO) is a native Android application designed to train competitive mathematics olympiad students through adaptive problem matchmaking, publication-grade LaTeX mathematical rendering, progressive pedagogical hints, and a diagnostic Socratic AI tutor.
 
 Built using **Modern Android Architecture (MVVM + Clean Architecture)**, the application leverages an OLED dark-mode design system derived from Google Stitch UI, strict separation of concerns, Dagger-Hilt dependency injection, and Room SQLite persistence.
 
----
+## Key Features
 
-## ✨ Key Features
-
-### 1. ⚔️ Competitive Elo Matchmaking Engine
+### 1. Competitive Elo Matchmaking Engine
 - **4 Olympiad Domains**: Tracks independent competitive ratings across the core Olympiad pillars:
   - **Algebra** (Polynomials, Functional Equations, Inequalities)
   - **Combinatorics** (Graph Theory, Extremal Principles, Counting & Invariants)
@@ -26,33 +22,31 @@ Built using **Modern Android Architecture (MVVM + Clean Architecture)**, the app
 - **Dynamic Logistic Curve**: Uses standard FIDE/logistic rating updates with adaptive K-factors based on student experience.
 - **Matchmaking Window**: Matches problems within a $\pm 150$ Elo window of the user's current rating, with nearest-neighbor fallback.
 
-### 2. 📝 Academic KaTeX Mathematical Rendering
+### 2. Academic KaTeX Mathematical Rendering
 - Custom `KatexWebView` rendering mathematical expressions in authentic **Computer Modern (CMU Serif)** typography.
 - Dynamic JavaScript height resizing ensures smooth inline rendering without layout shifts or clipped equations.
 - Seamless presentation of multi-line theorem environments, proofs, summation bounds, and modular notation.
 
-### 3. 💡 Progressive Pedagogical Hints System
+### 3. Progressive Pedagogical Hints System
 - Problems include multi-tiered progressive hints designed as conceptual stepping stones.
 - Students can unlock hints sequentially without spoiling the final numerical or algebraic solution.
 
-### 4. 🤖 Euler AI Tutor (LLM Integration)
+### 4. Euler AI Tutor (LLM Integration)
 - Powered by Retrofit and OpenAI/LLM endpoints.
 - **Hard-Stuck Trigger**: Automatically diagnoses errors and provides a custom hint when a student submits 3 consecutive incorrect attempts.
 - **Socratic Prompt Engineering**: The tutor analyzes previous attempts to identify false lemmas and nudges the student in the right direction without giving away the answer.
 
-### 5. 🗄️ Database Pre-population & Seed Data
+### 5. Database Pre-population & Seed Data
 - Pre-loaded with authentic **IOQM / RMO / INMO** questions across all 4 categories directly from `assets/questions_seed.json`.
 - Automatically seeded on the very first launch via Room's database lifecycle callback.
 
-### 6. 🧭 Jetpack Navigation & Bottom Navigation
+### 6. Jetpack Navigation & Bottom Navigation
 - Full Jetpack Navigation Graph routing between:
   - **Dashboard**: Radar profile, aggregate Elo, topic rating breakdown, and quick action cards.
   - **Practice Arena**: Interactive math arena with KaTeX WebView, quick-syntax keypad, progressive hints, and submission verification.
   - **Theory Monographs**: Academic theory reader covering advanced lemmas (e.g., Alon's Nullstellensatz, Vieta Jumping, Barycentric Coordinates).
 
----
-
-## 🛠️ Architecture & Tech Stack
+## Architecture & Tech Stack
 
 ```
 com.locus.olympiad
@@ -81,7 +75,7 @@ com.locus.olympiad
 ```
 
 | Component | Library / Framework | Version |
-| :--- | :--- | :--- |
+| | | |
 | **Language** | Kotlin | `1.9.23` |
 | **Build System** | Gradle (Kotlin DSL) / AGP | `8.3.2` |
 | **Min / Target SDK** | Android 7.0 (API 24) / Android 14 (API 34) | `24` / `34` |
@@ -93,9 +87,7 @@ com.locus.olympiad
 | **UI & Styling** | Material Components 3, ViewBinding, DataBinding | `1.11.0` |
 | **Unit Testing** | JUnit 4, MockK, Coroutines Test | `4.13.2` / `1.13.10` |
 
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 1. **Android Studio**: Iguana (2023.2.1), Jellyfish (2023.3.1), Koala, or Ladybug+.
@@ -136,9 +128,7 @@ com.locus.olympiad
      ./gradlew assembleDebug
      ```
 
----
-
-## 🧪 Running Unit Tests
+## Running Unit Tests
 
 To run the full suite of unit tests (testing the Elo rating calculator, AI Tutor prompt generator, progressive hints ViewModel state, and seed data parser):
 
@@ -146,9 +136,7 @@ To run the full suite of unit tests (testing the Elo rating calculator, AI Tutor
 ./gradlew test
 ```
 
----
-
-## 🤝 Contributing
+## Contributing
 
 Contributions to problem sets, UI animations, and new mathematical modules are welcome!
 1. Fork the repository.
@@ -157,8 +145,6 @@ Contributions to problem sets, UI animations, and new mathematical modules are w
 4. Push to your branch (`git push origin feature/new-olympiad-topic`).
 5. Open a Pull Request.
 
----
-
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
