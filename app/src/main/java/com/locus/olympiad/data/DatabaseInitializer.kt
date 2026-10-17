@@ -276,8 +276,8 @@ The constant ${'$'}\sqrt{5}${'$'} is best possible (Hurwitz's Theorem, achieved 
 \end{theorem}""",
                 heuristicsAndTricks = """\textbf{Competition Heuristics for Approximation:}
 \begin{itemize}
-    \item \textbf{Fractional Part Pigeonhole:} Partition the unit interval $[0, 1)$ into $N$ equal sub-intervals and consider the $N+1$ fractional parts $\{0\}, \{\alpha\}, \{2\alpha\}, \dots, \{N\alpha\}$.
-    \item \textbf{Continued Fractions:} The best rational approximations $p_n/q_n$ are the convergents of the simple continued fraction of $\alpha$.
+    \item \textbf{Fractional Part Pigeonhole:} Partition the unit interval ${'$'}[0, 1)${'$'} into ${'$'}N${'$'} equal sub-intervals and consider the ${'$'}N+1${'$'} fractional parts ${'$'}\{0\}, \{\alpha\}, \{2\alpha\}, \dots, \{N\alpha\}${'$'}.
+    \item \textbf{Continued Fractions:} The best rational approximations ${'$'}p_n/q_n${'$'} are the convergents of the simple continued fraction of ${'$'}\alpha${'$'}.
 \end{itemize}"""
             ),
             TheoryModule(
@@ -292,9 +292,9 @@ ${'$'}${'$'}u = \frac{\operatorname{Area}(\triangle PBC)}{\operatorname{Area}(\t
 with ${'$'}u + v + w = 1${'$'}. The incenter has coordinates ${'$'}(a : b : c)${'$'}, and the circumcenter has coordinates ${'$'}(\sin 2A : \sin 2B : \sin 2C)${'$'}.""",
                 heuristicsAndTricks = """\textbf{Strategic Shortcuts in Barycentric Geometry:}
 \begin{itemize}
-    \item \textbf{Area Coordinates:} Centroid is $(1:1:1)$, Incenter is $(a:b:c)$, Excenter $I_a$ is $(-a:b:c)$.
-    \item \textbf{Collinearity Determinant:} Three points $P_1, P_2, P_3$ are collinear if and only if $\det(P_1, P_2, P_3) = 0$.
-    \item \textbf{Concurrency of Cevians:} Ceva's Theorem in barycentrics reduces to $u_1 v_2 w_3 = u_2 v_3 w_1$.
+    \item \textbf{Area Coordinates:} Centroid is ${'$'}(1:1:1)${'$'}, Incenter is ${'$'}(a:b:c)${'$'}, Excenter ${'$'}I_a${'$'} is ${'$'}(-a:b:c)${'$'}.
+    \item \textbf{Collinearity Determinant:} Three points ${'$'}P_1, P_2, P_3${'$'} are collinear if and only if ${'$'}\det(P_1, P_2, P_3) = 0${'$'}.
+    \item \textbf{Concurrency of Cevians:} Ceva's Theorem in barycentrics reduces to ${'$'}u_1 v_2 w_3 = u_2 v_3 w_1${'$'}.
 \end{itemize}"""
             )
         )

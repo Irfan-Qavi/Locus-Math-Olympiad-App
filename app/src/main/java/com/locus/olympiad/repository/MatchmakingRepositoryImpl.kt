@@ -98,7 +98,14 @@ class MatchmakingRepositoryImpl(
 
             return@withContext Pair(
                 isUserValidated,
-                EloCalculationResult(oldElo = currentElo, newElo = currentElo, delta = 0)
+                EloCalculationResult(
+                    oldElo = currentElo,
+                    newElo = currentElo,
+                    delta = 0,
+                    expectedScore = EloCalculator.calculateExpectedScore(currentElo, question.difficultyElo),
+                    isCorrect = isUserValidated,
+                    questionDifficulty = question.difficultyElo
+                )
             )
         }
 
