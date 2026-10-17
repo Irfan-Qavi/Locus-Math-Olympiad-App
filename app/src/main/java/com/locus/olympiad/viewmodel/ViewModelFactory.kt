@@ -9,21 +9,24 @@ import com.locus.olympiad.repository.MatchmakingRepository
 class ViewModelFactory(
     private val matchmakingRepository: MatchmakingRepository,
     private val aiTutorRepository: AiTutorRepository,
-    private val userPreferencesRepository: UserPreferencesRepository? = null
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(PracticeViewModel::class.java) -> {
-                PracticeViewModel(matchmakingRepository, aiTutorRepository) as T
+                PracticeViewModel(
+                    matchmakingRepository = matchmakingRepository,
+                    aiTutorRepository = aiTutorRepository,
+                    userPreferencesRepository = userPreferencesRepository
+                ) as T
             }
             modelClass.isAssignableFrom(DashboardViewModel::class.java) -> {
-                if (userPreferencesRepository != null) {
-                    DashboardViewModel(matchmakingRepository, userPreferencesRepository) as T
-                } else {
-                    throw IllegalStateException("UserPreferencesRepository required for DashboardViewModel")
-                }
+                DashboardViewModel(
+                    matchmakingRepository = matchmakingRepository,
+                    userPreferencesRepository = userPreferencesRepository
+                ) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
