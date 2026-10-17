@@ -643,6 +643,8 @@
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
+
     <!-- Session Complete Celebration Overlay -->
     <FrameLayout
         android:id="@+id/overlaySessionComplete"
