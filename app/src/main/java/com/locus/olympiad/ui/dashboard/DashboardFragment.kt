@@ -15,6 +15,8 @@ import com.locus.olympiad.R
 import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.databinding.ActivityDashboardBinding
 import com.locus.olympiad.ui.onboarding.OnboardingDialog
+import com.locus.olympiad.ui.practice.PracticeConfigBottomSheet
+import com.locus.olympiad.ui.practice.PracticeFragment
 import com.locus.olympiad.viewmodel.DashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -57,22 +59,28 @@ class DashboardFragment : Fragment() {
 
     private fun setupListeners() {
         binding.btnStartPractice.setOnClickListener {
-            openPractice(MathTopic.COMBINATORICS)
+            openPracticeConfig(null)
         }
 
         binding.btnOpenTheory.setOnClickListener {
             findNavController().navigate(R.id.nav_theory)
         }
 
-        binding.cardCombinatorics.setOnClickListener { openPractice(MathTopic.COMBINATORICS) }
-        binding.cardAlgebra.setOnClickListener { openPractice(MathTopic.ALGEBRA) }
-        binding.cardNumberTheory.setOnClickListener { openPractice(MathTopic.NUMBER_THEORY) }
-        binding.cardGeometry.setOnClickListener { openPractice(MathTopic.GEOMETRY) }
+        binding.cardCombinatorics.setOnClickListener { openPracticeConfig(MathTopic.COMBINATORICS) }
+        binding.cardAlgebra.setOnClickListener { openPracticeConfig(MathTopic.ALGEBRA) }
+        binding.cardNumberTheory.setOnClickListener { openPracticeConfig(MathTopic.NUMBER_THEORY) }
+        binding.cardGeometry.setOnClickListener { openPracticeConfig(MathTopic.GEOMETRY) }
     }
 
-    private fun openPractice(topic: MathTopic) {
-        val bundle = bundleOf("category" to topic.displayName)
-        findNavController().navigate(R.id.nav_practice, bundle)
+    private fun openPracticeConfig(topic: MathTopic?) {
+        val sheet = PracticeConfigBottomSheet.newInstance(topic) { config ->
+            val bundle = bundleOf(
+                PracticeFragment.EXTRA_CONFIG to config,
+                "category" to config.topicDisplayName
+            )
+            findNavController().navigate(R.id.nav_practice, bundle)
+        }
+        sheet.show(childFragmentManager, PracticeConfigBottomSheet.TAG)
     }
 
     private fun observeState() {

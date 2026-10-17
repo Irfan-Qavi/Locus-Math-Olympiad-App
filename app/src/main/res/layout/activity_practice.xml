@@ -123,6 +123,19 @@
                             android:text="Tier III"
                             android:textColor="@color/on_surface_variant"
                             android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvSessionProgress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/badge_rounded_violet"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"
+                            android:text="Problem 1 • Endless"
+                            android:textColor="@color/secondary"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
                     <!-- Dynamically Resizing KaTeX WebView (CMU Serif) -->
@@ -477,6 +490,87 @@
                     android:textColor="@color/secondary"
                     app:cornerRadius="10dp"
                     app:strokeColor="@color/outline_variant" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    <!-- Session Complete Celebration Overlay -->
+    <FrameLayout
+        android:id="@+id/overlaySessionComplete"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#D90B0814"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="24dp"
+            app:cardBackgroundColor="@color/surface_container"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="20dp"
+            app:strokeColor="@color/outline_variant"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="28dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🏆"
+                    android:textSize="48sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Session Complete"
+                    android:textColor="@color/on_surface"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSessionSummary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:lineSpacingMultiplier="1.3"
+                    android:text="You solved 8 out of 10 problems."
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvSessionNetElo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/badge_rounded_violet"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="8dp"
+                    android:text="Net Rating: +48 Elo"
+                    android:textColor="@color/primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFinishSession"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="24dp"
+                    android:backgroundTint="@color/primary_container"
+                    android:text="Return to Dashboard"
+                    android:textColor="@color/on_primary_container"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="10dp" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

@@ -54,6 +54,33 @@ interface PracticeQuestionDao {
         targetElo: Int
     ): PracticeQuestion?
 
+    /**
+     * General Matchmaking Query (supports category = null for MIX ALL TYPES and specific difficulty ranges).
+     */
+    @Query("""
+        SELECT * FROM practice_questions 
+        WHERE (:category IS NULL OR category = :category)
+          AND difficulty_elo BETWEEN :minElo AND :maxElo 
+        ORDER BY RANDOM() 
+        LIMIT 1
+    """)
+    suspend fun findQuestionFiltered(
+        category: String?, 
+        minElo: Int, 
+        maxElo: Int
+    ): PracticeQuestion?
+
+    @Query("""
+        SELECT * FROM practice_questions 
+        WHERE (:category IS NULL OR category = :category)
+        ORDER BY ABS(difficulty_elo - :targetElo) ASC 
+        LIMIT 1
+    """)
+    suspend fun findClosestQuestionFiltered(
+        category: String?, 
+        targetElo: Int
+    ): PracticeQuestion?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertQuestion(question: PracticeQuestion): Long
 

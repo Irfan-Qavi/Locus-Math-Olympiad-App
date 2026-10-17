@@ -22,13 +22,13 @@ interface MatchmakingRepository {
     fun getAllUserProfiles(): Flow<List<UserTopicProfile>>
 
     /**
-     * Fetches the next practice question matched to the user's current Elo rating (+/- 150 points).
-     * 
-     * 1. Checks user's current Elo in the selected category (defaults to 1000 if not found).
-     * 2. Queries question within [userElo - 150, userElo + 150].
-     * 3. Falls back to nearest question if no exact match exists in the +/- 150 window.
+     * Fetches the next practice question matched to the user's current Elo rating or configured difficulty.
+     * If category is null, queries across all topics ("MIX ALL TYPES").
      */
-    suspend fun getNextPracticeQuestion(category: MathTopic): PracticeQuestion?
+    suspend fun getNextPracticeQuestion(
+        category: MathTopic?,
+        difficultyTier: String = "Adaptive"
+    ): PracticeQuestion?
 
     /**
      * Validates a user's answer submission, computes new Elo using standard Elo math,

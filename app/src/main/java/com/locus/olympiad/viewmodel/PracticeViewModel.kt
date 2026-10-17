@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.data.model.PracticeQuestion
+import com.locus.olympiad.data.model.PracticeSessionConfig
 import com.locus.olympiad.domain.ai.AiTutorRepository
 import com.locus.olympiad.repository.MatchmakingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,21 +25,69 @@ class PracticeViewModel @Inject constructor(
     val uiState: StateFlow<PracticeUiState> = _uiState.asStateFlow()
 
     /**
-     * Loads the next question matched to the user's current rating (+/- 150 points).
+     * Initializes a new practice session with the user-selected configurator options.
      */
-    fun loadNextQuestion(category: MathTopic) {
+    fun startSession(config: PracticeSessionConfig) {
+        _uiState.update {
+            it.copy(
+                sessionConfig = config,
+                sessionQuestionIndex = 1,
+                sessionSolvedCount = 0,
+                sessionNetEloDelta = 0,
+                isSessionCompleted = false,
+                incorrectAttempts = emptyList(),
+                isHardStuck = false,
+                aiTutorHint = null,
+                lastSubmissionCorrect = null,
+                lastEloDelta = null
+            )
+        }
+        loadNextQuestion(config.topic)
+    }
+
+    /**
+     * Advances to the next question in the session, or marks the session complete
+     * if the target problem count has been reached.
+     */
+    fun proceedToNextQuestion() {
+        val config = _uiState.value.sessionConfig
+        val currentIndex = _uiState.value.sessionQuestionIndex
+
+        if (!config.isEndless && currentIndex >= config.questionCount) {
+            _uiState.update {
+                it.copy(
+                    isSessionCompleted = true,
+                    lastSubmissionCorrect = null,
+                    lastEloDelta = null
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    sessionQuestionIndex = currentIndex + 1,
+                    lastSubmissionCorrect = null,
+                    lastEloDelta = null
+                )
+            }
+            loadNextQuestion(_uiState.value.sessionConfig.topic)
+        }
+    }
+
+    /**
+     * Loads the next question matched to the user's current rating or difficulty tier.
+     */
+    fun loadNextQuestion(category: MathTopic? = _uiState.value.sessionConfig.topic) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingQuestion = true, errorMessage = null) }
             try {
-                val question = matchmakingRepository.getNextPracticeQuestion(category)
+                val difficultyTier = _uiState.value.sessionConfig.difficultyTier
+                val question = matchmakingRepository.getNextPracticeQuestion(category, difficultyTier)
                 if (question != null) {
                     _uiState.update { current ->
                         current.copy(
                             currentQuestion = question,
                             isLoadingQuestion = false,
-                            // Progressive hint system reset for new problem
                             revealedHintsCount = 0,
-                            // Reset incorrect attempts and AI tutor state
                             incorrectAttempts = emptyList(),
                             isHardStuck = false,
                             aiTutorHint = null,
@@ -52,7 +101,7 @@ class PracticeViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoadingQuestion = false,
-                            errorMessage = "No questions found for ${category.displayName} in your current rating range."
+                            errorMessage = "No questions found matching your practice criteria."
                         )
                     }
                 }
@@ -133,9 +182,10 @@ class PracticeViewModel @Inject constructor(
                             userElo = eloResult.newElo,
                             lastSubmissionCorrect = true,
                             lastEloDelta = eloResult.delta,
+                            sessionSolvedCount = current.sessionSolvedCount + 1,
+                            sessionNetEloDelta = current.sessionNetEloDelta + eloResult.delta,
                             isEvaluatingAnswer = false,
                             feedbackMessage = "Correct! Master Elo increased by +${eloResult.delta} pts (${eloResult.newElo}).",
-                            // Reset attempts and stuck state on success
                             incorrectAttempts = emptyList(),
                             isHardStuck = false,
                             aiTutorHint = null
@@ -150,6 +200,7 @@ class PracticeViewModel @Inject constructor(
                             userElo = eloResult.newElo,
                             lastSubmissionCorrect = false,
                             lastEloDelta = eloResult.delta,
+                            sessionNetEloDelta = current.sessionNetEloDelta + eloResult.delta,
                             isEvaluatingAnswer = false,
                             feedbackMessage = "Incorrect (${eloResult.delta} pts). Re-examine your lemmas.",
                             incorrectAttempts = updatedAttempts,
@@ -157,8 +208,6 @@ class PracticeViewModel @Inject constructor(
                         )
                     }
 
-                    // THE HARD-STUCK TRIGGER:
-                    // If incorrectAttempts.size >= 3, automatically trigger AI Tutor API call
                     if (isStuck) {
                         triggerAiTutorHint(question, eloResult.newElo, updatedAttempts)
                     }
@@ -220,4 +269,3 @@ class PracticeViewModel @Inject constructor(
         }
     }
 }
-

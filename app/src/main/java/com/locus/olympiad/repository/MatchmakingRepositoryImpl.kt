@@ -25,22 +25,37 @@ class MatchmakingRepositoryImpl(
         return profileDao.getAllProfiles()
     }
 
-    override suspend fun getNextPracticeQuestion(category: MathTopic): PracticeQuestion? = withContext(Dispatchers.IO) {
-        val categoryName = category.displayName
-        
-        // 1. Fetch current Elo in the selected category (default 1000)
-        val userElo = profileDao.getEloRatingForCategory(categoryName) 
-            ?: UserTopicProfile.DEFAULT_ELO
+    override suspend fun getNextPracticeQuestion(
+        category: MathTopic?,
+        difficultyTier: String
+    ): PracticeQuestion? = withContext(Dispatchers.IO) {
+        val categoryName = category?.displayName
 
-        // 2. Compute the +/- 150 points matchmaking window
-        val (minElo, maxElo) = EloCalculator.getMatchmakingWindow(userElo)
+        val (minElo, maxElo, targetElo) = when (difficultyTier.lowercase()) {
+            "novice", "foundational" -> Triple(0, 1199, 1000)
+            "intermediate" -> Triple(1200, 1500, 1350)
+            "olympiad", "advanced" -> Triple(1501, 3000, 1750)
+            "all", "all difficulties" -> Triple(0, 3000, 1300)
+            else -> {
+                // Adaptive mode: match user's actual Elo (+/- 150)
+                val userElo = if (categoryName != null) {
+                    profileDao.getEloRatingForCategory(categoryName) ?: UserTopicProfile.DEFAULT_ELO
+                } else {
+                    val all = profileDao.getAllProfilesSync()
+                    if (all.isNotEmpty()) all.map { it.eloRating }.average().toInt() else UserTopicProfile.DEFAULT_ELO
+                }
+                val (windowMin, windowMax) = EloCalculator.getMatchmakingWindow(userElo)
+                Triple(windowMin, windowMax, userElo)
+            }
+        }
 
-        // 3. Query questions within +/- 150 rating points
-        var question = questionDao.findQuestionInEloRange(categoryName, minElo, maxElo)
-
-        // 4. Fallback if no questions are found in the exact window
+        var question = questionDao.findQuestionFiltered(categoryName, minElo, maxElo)
         if (question == null) {
-            question = questionDao.findClosestQuestion(categoryName, userElo)
+            question = questionDao.findClosestQuestionFiltered(categoryName, targetElo)
+        }
+        if (question == null && categoryName != null) {
+            // Fallback to any topic if the specific category had no questions
+            question = questionDao.findClosestQuestionFiltered(null, targetElo)
         }
 
         question

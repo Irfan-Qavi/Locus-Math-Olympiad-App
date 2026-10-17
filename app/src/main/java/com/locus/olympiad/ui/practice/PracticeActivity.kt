@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.locus.olympiad.R
 import com.locus.olympiad.data.model.MathTopic
+import com.locus.olympiad.data.model.PracticeSessionConfig
 import com.locus.olympiad.databinding.ActivityPracticeBinding
 import com.locus.olympiad.viewmodel.PracticeUiState
 import com.locus.olympiad.viewmodel.PracticeViewModel
@@ -25,25 +26,28 @@ class PracticeActivity : AppCompatActivity() {
     private val viewModel: PracticeViewModel by viewModels()
 
     private var currentRenderedQuestionId: Long? = null
-    private var currentTopic: MathTopic = MathTopic.COMBINATORICS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPracticeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val topicName = intent.getStringExtra(EXTRA_CATEGORY) ?: "Combinatorics"
-        currentTopic = MathTopic.fromString(topicName)
+        val config = (intent.getSerializableExtra(EXTRA_CONFIG) as? PracticeSessionConfig)
+            ?: run {
+                val topicName = intent.getStringExtra(EXTRA_CATEGORY)
+                val topic = topicName?.let { MathTopic.fromString(it) }
+                PracticeSessionConfig(topic = topic)
+            }
 
-        setupListeners(currentTopic)
+        setupListeners()
         observeState()
 
         if (savedInstanceState == null) {
-            viewModel.loadNextQuestion(currentTopic)
+            viewModel.startSession(config)
         }
     }
 
-    private fun setupListeners(topic: MathTopic) {
+    private fun setupListeners() {
         binding.btnBack.setOnClickListener { finish() }
 
         binding.btnRevealHint.setOnClickListener {
@@ -58,12 +62,17 @@ class PracticeActivity : AppCompatActivity() {
         // Evaluation Result Modal Actions
         binding.btnEvaluationNext.setOnClickListener {
             viewModel.dismissEvaluationResult()
-            viewModel.loadNextQuestion(currentTopic)
+            viewModel.proceedToNextQuestion()
         }
 
         binding.btnEvaluationRetry.setOnClickListener {
             viewModel.dismissEvaluationResult()
             binding.etAnswer.requestFocus()
+        }
+
+        // Session Complete Action
+        binding.btnFinishSession.setOnClickListener {
+            finish()
         }
 
         // Quick Syntax Keypads
@@ -94,17 +103,17 @@ class PracticeActivity : AppCompatActivity() {
         binding.progressLoading.isVisible = state.isLoadingQuestion || state.isEvaluatingAnswer
         binding.btnSubmitAnswer.isEnabled = !state.isEvaluatingAnswer
 
-        // User Rating Badge
-        val topic = state.currentQuestion?.topic ?: currentTopic
-        binding.tvTopicTitle.text = topic.displayName
+        // Session Config & User Rating Badge
+        val topic = state.currentQuestion?.topic ?: state.sessionConfig.topic
+        binding.tvTopicTitle.text = topic?.displayName ?: state.sessionConfig.topicDisplayName
         binding.tvEloBadge.text = "${state.userElo} [Master]"
+        binding.tvSessionProgress.text = state.sessionProgressText
 
         // Question Details & CMU Serif KaTeX WebView Rendering
         state.currentQuestion?.let { question ->
             binding.tvProblemTag.text = "PROBLEM #${question.id}"
             binding.tvProblemTier.text = question.tier
 
-            // Only reload WebView when question ID actually changes to prevent flickering
             if (currentRenderedQuestionId != question.id) {
                 currentRenderedQuestionId = question.id
                 binding.webViewProblemMath.setLatexContent(question.latexContent)
@@ -175,6 +184,17 @@ class PracticeActivity : AppCompatActivity() {
             binding.overlayEvaluationResult.isVisible = false
         }
 
+        // Session Complete Overlay
+        if (state.isSessionCompleted) {
+            binding.overlaySessionComplete.isVisible = true
+            binding.tvSessionSummary.text = "You solved ${state.sessionSolvedCount} out of ${state.sessionConfig.questionCount} problems."
+            val netDelta = state.sessionNetEloDelta
+            val netSign = if (netDelta >= 0) "+$netDelta" else "$netDelta"
+            binding.tvSessionNetElo.text = "Net Rating: $netSign Elo"
+        } else {
+            binding.overlaySessionComplete.isVisible = false
+        }
+
         // Feedback / Toast
         state.feedbackMessage?.let { msg ->
             binding.tvFeedback.isVisible = true
@@ -190,5 +210,6 @@ class PracticeActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_CATEGORY = "extra_category"
+        const val EXTRA_CONFIG = "extra_session_config"
     }
 }
