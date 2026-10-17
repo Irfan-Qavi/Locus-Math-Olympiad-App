@@ -28,17 +28,16 @@ object DatabaseInitializer {
             profileDao.insertProfiles(initialProfiles)
         }
 
-        // 2. Seed practice questions if table is empty
+        // 2. Seed practice questions if table is empty via memory-safe streaming (100 items/chunk)
         if (questionDao.countQuestions() == 0) {
-            val parsedQuestions = if (context != null) {
-                SeedDataParser.parseSeedQuestions(context)
-            } else {
-                emptyList()
+            var totalSeeded = 0
+            if (context != null) {
+                totalSeeded = SeedDataParser.streamSeedQuestionsInChunks(context, chunkSize = 100) { chunk ->
+                    questionDao.insertQuestions(chunk)
+                }
             }
 
-            if (parsedQuestions.isNotEmpty()) {
-                questionDao.insertQuestions(parsedQuestions)
-            } else {
+            if (totalSeeded == 0) {
                 questionDao.insertQuestions(getDefaultSampleQuestions())
             }
         }

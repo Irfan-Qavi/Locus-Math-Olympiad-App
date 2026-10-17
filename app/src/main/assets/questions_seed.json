@@ -45,12 +45,12 @@
     "category": "Combinatorics",
     "difficulty_elo": 1210,
     "question_type": "OBJECTIVE",
-    "latex_content": "In how many ways can 12 identical math olympiad medals be distributed among 4 distinct students such that each student receives at least one medal?",
-    "correct_answer": "165",
+    "latex_content": "In how many ways can 10 identical math olympiad medals be distributed among 4 distinct students such that each student receives at least one medal?",
+    "correct_answer": "84",
     "list_of_hints": [
       "Apply the Stars and Bars theorem (balls and urns representation).",
-      "Give 1 medal to each of the 4 students first, leaving $12 - 4 = 8$ medals to distribute freely.",
-      "Calculate $\\binom{8 + 4 - 1}{4 - 1} = \\binom{11}{3} = \\frac{11 \\times 10 \\times 9}{6}$."
+      "Give 1 medal to each of the 4 students first, leaving $10 - 4 = 6$ medals to distribute freely.",
+      "Calculate $\\binom{6 + 4 - 1}{4 - 1} = \\binom{9}{3} = \\frac{9 \\times 8 \\times 7}{6} = 84$."
     ],
     "source": "RMO Combinatorics Prelims",
     "tier": "Tier I"
