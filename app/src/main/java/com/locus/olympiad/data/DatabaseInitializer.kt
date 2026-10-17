@@ -6,16 +6,20 @@ import com.locus.olympiad.data.model.PracticeQuestion
 import com.locus.olympiad.data.model.TheoryModule
 import com.locus.olympiad.data.model.UserTopicProfile
 
+/**
+ * Pre-populates the Room database with standard Elo profiles, rich 3-tier theory monographs,
+ * and competitive math olympiad seed questions.
+ */
 object DatabaseInitializer {
 
-    suspend fun seedDatabase(context: Context? = null, database: LocusDatabase) {
+    suspend fun seedDatabase(context: Context?, database: LocusDatabase) {
         val profileDao = database.userTopicProfileDao()
         val questionDao = database.practiceQuestionDao()
         val theoryDao = database.theoryModuleDao()
 
-        // 1. Seed initial 1000 Elo for 4 topics if not present
+        // 1. Seed default UserTopicProfile for each MathTopic
         if (profileDao.countProfiles() == 0) {
-            val initialProfiles = MathTopic.ALL_TOPICS.map { topic ->
+            val initialProfiles = MathTopic.values().map { topic ->
                 UserTopicProfile(
                     category = topic.displayName,
                     eloRating = UserTopicProfile.DEFAULT_ELO // 1000
@@ -194,9 +198,10 @@ What is the sum ${'$'}p + q${'$'}?""",
         return listOf(
             TheoryModule(
                 category = "Combinatorics",
-                title = "Combinatorial Nullstellensatz & Graph Polynomials",
-                chapterNumber = 4,
-                readProgressPercent = 42,
+                chapterName = "Chapter 1: Extremal Principles & Graph Theorems",
+                chapterNumber = 1,
+                title = "Alon's Combinatorial Nullstellensatz",
+                readProgressPercent = 85,
                 latexContent = """\section*{Alon's Combinatorial Nullstellensatz}
 Let ${'$'}\mathbb{F}${'$'} be an arbitrary field, and let ${'$'}P \in \mathbb{F}[x_1, \dots, x_n]${'$'} be a polynomial of degree ${'$'}\deg(P) = \sum_{i=1}^n t_i${'$'}, where each ${'$'}t_i${'$'} is a non-negative integer.
 
@@ -207,13 +212,59 @@ such that ${'$'}P(s_1, \dots, s_n) \ne 0${'$'}.
 \end{theorem}
 
 \subsection*{Application to Graph Coloring}
-Consider the graph polynomial ${'$'}f_G(x) = \prod_{uv \in E, u < v} (x_u - x_v)${'$'}. If ${'$'}G${'$'} is ${'$'}k${'$'}-choosable, we construct non-vanishing evaluations over list colorings ${'$'}L(v)${'$'} with ${'$'}|L(v)| \ge k${'$'}."""
+Consider the graph polynomial ${'$'}f_G(x) = \prod_{uv \in E, u < v} (x_u - x_v)${'$'}. If ${'$'}G${'$'} is ${'$'}k${'$'}-choosable, we construct non-vanishing evaluations over list colorings ${'$'}L(v)${'$'} with ${'$'}|L(v)| \ge k${'$'}.""",
+                heuristicsAndTricks = """\textbf{Key Olympiad Heuristics & Mental Models:}
+\begin{itemize}
+    \item \textbf{Degree Matching Rule:} To apply Nullstellensatz, you must match the degree of each variable ${'$'}t_i < |S_i|${'$'}. Always expand only the leading monomial.
+    \item \textbf{Look at the Extremes:} Pick vertices of maximum degree or extreme coordinate hyperplanes when defining the vanishing set.
+    \item \textbf{Subsets of Restricted Sums:} For problems of type ${'$'}a + b \ne c${'$'}, write polynomial ${'$'}\prod (x_i + x_j - c)${'$'} and verify the coefficient of ${'$'}x_1^{|A|-1} x_2^{|B|-1}${'$'}.
+\end{itemize}"""
+            ),
+            TheoryModule(
+                category = "Combinatorics",
+                chapterName = "Chapter 1: Extremal Principles & Graph Theorems",
+                chapterNumber = 1,
+                title = "Erdős-Szekeres Monotone Subsequences",
+                readProgressPercent = 60,
+                latexContent = """\section*{The Erdős-Szekeres Theorem}
+\begin{theorem}[Erdős-Szekeres, 1935]
+Every sequence of ${'$'}n = rs + 1${'$'} distinct real numbers contains either an increasing subsequence of length ${'$'}r + 1${'$'} or a decreasing subsequence of length ${'$'}s + 1${'$'}.
+\end{theorem}
+
+\subsection*{Pigeonhole Proof via Coordinates}
+For each index ${'$'}k${'$'}, assign the coordinate ${'$'}(a_k, b_k)${'$'}, where ${'$'}a_k${'$'} is the length of the longest increasing subsequence ending at ${'$'}x_k${'$'}, and ${'$'}b_k${'$'} is the length of the longest decreasing subsequence ending at ${'$'}x_k${'$'}. If ${'$'}a_k \le r${'$'} and ${'$'}b_k \le s${'$'} for all ${'$'}k${'$'}, then there are at most ${'$'}rs${'$'} distinct pairs ${'$'}(a_k, b_k)${'$'}. By the Pigeonhole Principle, some pair must repeat, which easily yields a contradiction.""",
+                heuristicsAndTricks = """\textbf{Competition Heuristics:}
+\begin{itemize}
+    \item \textbf{Dilworth's Poset Duality:} The minimum number of chains needed to cover a poset equals the maximum size of an antichain.
+    \item \textbf{Grid Invariance:} When ordering elements, assign a dynamic 2D index to track growth in both orientations.
+\end{itemize}"""
+            ),
+            TheoryModule(
+                category = "Algebra",
+                chapterName = "Chapter 1: Diophantine Symmetries & Polynomials",
+                chapterNumber = 1,
+                title = "Vieta Jumping & Minimal Descent",
+                readProgressPercent = 70,
+                latexContent = """\section*{Vieta's Root Flipping (Vieta Jumping)}
+Vieta jumping is a proof technique in Olympiad number theory and algebra, especially effective for Diophantine equations involving symmetric quadratic forms.
+
+\begin{theorem}
+Let ${'$'}(x, y)${'$'} be a solution to ${'$'}x^2 - Axy + y^2 = B${'$'}. Fixing ${'$'}y${'$'}, the equation is quadratic in ${'$'}x${'$'}:
+${'$'}${'$'}x^2 - (Ay)x + (y^2 - B) = 0${'$'}${'$'}
+By Vieta's formulas, if ${'$'}x_1${'$'} is one root, the second root ${'$'}x_2 = Ay - x_1 = \frac{y^2 - B}{x_1}${'$'} yields a new integer solution.
+\end{theorem}""",
+                heuristicsAndTricks = """\textbf{Strategic Instincts for Vieta Jumping:}
+\begin{itemize}
+    \item \textbf{Minimal Counterexample:} Assume a non-square ratio ${'$'}k = \frac{x^2+y^2}{xy+1}${'$'} exists, and pick the pair ${'$'}(x, y)${'$'} that minimizes the sum ${'$'}x + y${'$'}.
+    \item \textbf{Descent Contradiction:} Show that the reflected root ${'$'}x_2${'$'} is strictly positive and satisfies ${'$'}x_2 + y < x_1 + y${'$'}, contradicting minimality.
+\end{itemize}"""
             ),
             TheoryModule(
                 category = "Number Theory",
-                title = "Diophantine Approximation & Dirichlet's Approximation Theorem",
+                chapterName = "Chapter 1: Diophantine Approximation & Hurwitz Bounds",
                 chapterNumber = 1,
-                readProgressPercent = 57,
+                title = "Dirichlet's Approximation Theorem",
+                readProgressPercent = 55,
                 latexContent = """\section*{Dirichlet's Approximation Theorem}
 Let ${'$'}\alpha${'$'} be an arbitrary real number and let ${'$'}N \ge 1${'$'} be a positive integer.
 
@@ -223,31 +274,29 @@ ${'$'}${'$'}\left| \alpha - \frac{p}{q} \right| < \frac{1}{q N} \le \frac{1}{q^2
 Moreover, if ${'$'}\alpha${'$'} is irrational, there exist infinitely many pairs of coprime integers ${'$'}(p, q)${'$'} such that:
 ${'$'}${'$'}\left| \alpha - \frac{p}{q} \right| < \frac{1}{\sqrt{5} q^2}${'$'}${'$'}
 The constant ${'$'}\sqrt{5}${'$'} is best possible (Hurwitz's Theorem, achieved by the golden ratio ${'$'}\phi${'$'}).
-\end{theorem}"""
-            ),
-            TheoryModule(
-                category = "Algebra",
-                title = "Symmetric Polynomials & Vieta's Jumping",
-                chapterNumber = 2,
-                readProgressPercent = 35,
-                latexContent = """\section*{Vieta's Root Flipping (Vieta Jumping)}
-Vieta jumping is a proof technique in Olympiad number theory and algebra, especially effective for Diophantine equations involving symmetric quadratic forms.
-
-\begin{theorem}
-Let ${'$'}(x, y)${'$'} be a solution to ${'$'}x^2 - Axy + y^2 = B${'$'}. Fixing ${'$'}y${'$'}, the equation is quadratic in ${'$'}x${'$'}:
-${'$'}${'$'}x^2 - (Ay)x + (y^2 - B) = 0${'$'}${'$'}
-By Vieta's formulas, if ${'$'}x_1${'$'} is one root, the second root ${'$'}x_2 = Ay - x_1 = \frac{y^2 - B}{x_1}${'$'} yields a new integer solution.
-\end{theorem}"""
+\end{theorem}""",
+                heuristicsAndTricks = """\textbf{Competition Heuristics for Approximation:}
+\begin{itemize}
+    \item \textbf{Fractional Part Pigeonhole:} Partition the unit interval $[0, 1)$ into $N$ equal sub-intervals and consider the $N+1$ fractional parts $\{0\}, \{\alpha\}, \{2\alpha\}, \dots, \{N\alpha\}$.
+    \item \textbf{Continued Fractions:} The best rational approximations $p_n/q_n$ are the convergents of the simple continued fraction of $\alpha$.
+\end{itemize}"""
             ),
             TheoryModule(
                 category = "Geometry",
-                title = "Barycentric Coordinates & Projective Geometry",
-                chapterNumber = 3,
-                readProgressPercent = 91,
+                chapterName = "Chapter 1: Projective & Barycentric Configurations",
+                chapterNumber = 1,
+                title = "Homogeneous Barycentric Coordinates",
+                readProgressPercent = 90,
                 latexContent = """\section*{Homogeneous Barycentric Coordinates}
 Let ${'$'}\triangle ABC${'$'} be a reference triangle. Any point ${'$'}P${'$'} in the plane can be uniquely represented up to scale by homogeneous coordinates ${'$'}(u : v : w)${'$'} where:
 ${'$'}${'$'}u = \frac{\operatorname{Area}(\triangle PBC)}{\operatorname{Area}(\triangle ABC)}, \quad v = \frac{\operatorname{Area}(\triangle PCA)}{\operatorname{Area}(\triangle ABC)}, \quad w = \frac{\operatorname{Area}(\triangle PAB)}{\operatorname{Area}(\triangle ABC)}${'$'}${'$'}
-with ${'$'}u + v + w = 1${'$'}. The incenter has coordinates ${'$'}(a : b : c)${'$'}, and the circumcenter has coordinates ${'$'}(\sin 2A : \sin 2B : \sin 2C)${'$'}."""
+with ${'$'}u + v + w = 1${'$'}. The incenter has coordinates ${'$'}(a : b : c)${'$'}, and the circumcenter has coordinates ${'$'}(\sin 2A : \sin 2B : \sin 2C)${'$'}.""",
+                heuristicsAndTricks = """\textbf{Strategic Shortcuts in Barycentric Geometry:}
+\begin{itemize}
+    \item \textbf{Area Coordinates:} Centroid is $(1:1:1)$, Incenter is $(a:b:c)$, Excenter $I_a$ is $(-a:b:c)$.
+    \item \textbf{Collinearity Determinant:} Three points $P_1, P_2, P_3$ are collinear if and only if $\det(P_1, P_2, P_3) = 0$.
+    \item \textbf{Concurrency of Cevians:} Ceva's Theorem in barycentrics reduces to $u_1 v_2 w_3 = u_2 v_3 w_1$.
+\end{itemize}"""
             )
         )
     }
