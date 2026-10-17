@@ -82,7 +82,7 @@ class PracticeViewModelTest {
             EloCalculationResult(1000, 984, -16, 0.5, false, 1000)
         )
         coEvery { aiTutorRepository.getConceptualHint(any(), any(), any()) } returns Result.success(
-            "Consider the parity of the degree sum over $A$."
+            "Consider the parity of the degree sum over \$A."
         )
 
         val viewModel = PracticeViewModel(matchmakingRepository, aiTutorRepository)
@@ -106,7 +106,7 @@ class PracticeViewModelTest {
         advanceUntilIdle()
         assertTrue(viewModel.uiState.value.isHardStuck)
         assertEquals(listOf("1", "2", "4"), viewModel.uiState.value.incorrectAttempts)
-        assertEquals("Consider the parity of the degree sum over $A$.", viewModel.uiState.value.aiTutorHint)
+        assertEquals("Consider the parity of the degree sum over \$A.", viewModel.uiState.value.aiTutorHint)
 
         // Verify AI Tutor repository was called
         coVerify(exactly = 1) {

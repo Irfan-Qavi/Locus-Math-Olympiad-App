@@ -65,11 +65,11 @@ class AiTutorRepositoryImpl(
         incorrectAttempts: List<String>
     ): String {
         return when (question.category) {
-            "Combinatorics" -> "Try evaluating the degree parity of vertex subset $A$ modulo 2 to see whether an odd Eulerian cycle must be traversed."
-            "Algebra" -> "Notice that expanding $(x - y)^3$ directly combines the cubic and bilinear terms of your system into a single integer."
-            "Number Theory" -> "Examine the equation modulo the smallest prime divisor and consider the parity of the factors $(p - 1)(p + 1)$."
-            "Geometry" -> "Consider reflecting the orthocenter $H$ across the sides of $\\triangle ABC$ onto the circumcircle."
-            else -> "Consider constructing an invariant under the problem's symmetry before substituting specific numerical candidates."
+            "Combinatorics" -> """Try evaluating the degree parity of vertex subset ${'$'}A modulo 2 to see whether an odd Eulerian cycle must be traversed."""
+            "Algebra" -> """Notice that expanding (x - y)^3 directly combines the cubic and bilinear terms of your system into a single integer."""
+            "Number Theory" -> """Examine the equation modulo the smallest prime divisor and consider the parity of the factors (p - 1)(p + 1)."""
+            "Geometry" -> """Consider reflecting the orthocenter ${'$'}H across the sides of \triangle ABC onto the circumcircle."""
+            else -> """Consider constructing an invariant under the problem's symmetry before substituting specific numerical candidates."""
         }
     }
 }
