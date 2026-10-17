@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.databinding.ActivityDashboardBinding
+import com.locus.olympiad.ui.onboarding.OnboardingDialog
 import com.locus.olympiad.ui.practice.PracticeActivity
 import com.locus.olympiad.ui.theory.TheoryActivity
 import com.locus.olympiad.viewmodel.DashboardViewModel
@@ -26,8 +27,21 @@ class DashboardActivity : AppCompatActivity() {
         binding = ActivityDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        checkOnboarding()
         setupListeners()
         observeState()
+    }
+
+    private fun checkOnboarding() {
+        if (!viewModel.hasCompletedOnboarding()) {
+            val existing = supportFragmentManager.findFragmentByTag(OnboardingDialog.TAG)
+            if (existing == null) {
+                val dialog = OnboardingDialog.newInstance { chosenName ->
+                    viewModel.setUserName(chosenName)
+                }
+                dialog.show(supportFragmentManager, OnboardingDialog.TAG)
+            }
+        }
     }
 
     private fun setupListeners() {
@@ -57,7 +71,11 @@ class DashboardActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     binding.tvOverallElo.text = "%,d".format(state.overallElo)
-                    binding.tvMasterBadge.text = "${state.overallElo} [Master]"
+                    binding.tvMasterBadge.text = "${state.overallElo} [${state.rankTitle}]"
+
+                    binding.tvUserInitial.text = state.userInitial
+                    binding.tvGreeting.text = "Welcome, ${state.userName}"
+                    binding.tvUserRank.text = state.rankTitle
 
                     binding.tvCombinatoricsElo.text = "${state.combinatoricsElo} Elo"
                     binding.tvAlgebraElo.text = "${state.algebraElo} Elo"

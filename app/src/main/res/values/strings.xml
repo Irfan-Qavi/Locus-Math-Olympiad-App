@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Euler Olympiad</string>
+    <string name="app_name">Locus</string>
     <string name="app_tagline">IOQM/RMO Olympiad Prep with Adaptive AI Tutor</string>
     <string name="category_algebra">Algebra</string>
     <string name="category_geometry">Geometry</string>

@@ -194,7 +194,7 @@ class PracticeViewModel @Inject constructor(
                     it.copy(
                         isLoadingAiHint = false,
                         aiTutorHint = hintSentence,
-                        feedbackMessage = "Euler AI Tutor has diagnosed your attempts and generated a conceptual stepping stone."
+                        feedbackMessage = "Locus AI Tutor has diagnosed your attempts and generated a conceptual stepping stone."
                     )
                 }
             }.onFailure { error ->
@@ -207,4 +207,17 @@ class PracticeViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Dismisses the evaluation feedback overlay and allows retrying or reviewing the question.
+     */
+    fun dismissEvaluationResult() {
+        _uiState.update {
+            it.copy(
+                lastSubmissionCorrect = null,
+                lastEloDelta = null
+            )
+        }
+    }
 }
+

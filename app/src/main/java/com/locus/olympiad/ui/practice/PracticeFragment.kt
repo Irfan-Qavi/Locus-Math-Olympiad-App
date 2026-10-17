@@ -28,7 +28,9 @@ class PracticeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: PracticeViewModel by viewModels()
+
     private var currentRenderedQuestionId: Long? = null
+    private var currentTopic: MathTopic = MathTopic.COMBINATORICS
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,13 +45,13 @@ class PracticeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val topicName = arguments?.getString("category") ?: "Combinatorics"
-        val topic = MathTopic.fromString(topicName)
+        currentTopic = MathTopic.fromString(topicName)
 
-        setupListeners(topic)
+        setupListeners(currentTopic)
         observeState()
 
         if (savedInstanceState == null) {
-            viewModel.loadNextQuestion(topic)
+            viewModel.loadNextQuestion(currentTopic)
         }
     }
 
@@ -67,6 +69,17 @@ class PracticeFragment : Fragment() {
         binding.btnSubmitAnswer.setOnClickListener {
             val answer = binding.etAnswer.text?.toString().orEmpty()
             viewModel.submitAnswer(answer)
+        }
+
+        // Evaluation Result Modal Actions
+        binding.btnEvaluationNext.setOnClickListener {
+            viewModel.dismissEvaluationResult()
+            viewModel.loadNextQuestion(currentTopic)
+        }
+
+        binding.btnEvaluationRetry.setOnClickListener {
+            viewModel.dismissEvaluationResult()
+            binding.etAnswer.requestFocus()
         }
 
         // Quick Syntax Keypads
@@ -100,7 +113,7 @@ class PracticeFragment : Fragment() {
         binding.btnSubmitAnswer.isEnabled = !state.isEvaluatingAnswer
 
         // User Rating Badge
-        val topic = state.currentQuestion?.topic ?: MathTopic.COMBINATORICS
+        val topic = state.currentQuestion?.topic ?: currentTopic
         binding.tvTopicTitle.text = topic.displayName
         binding.tvEloBadge.text = "${state.userElo} [Master]"
 
@@ -147,9 +160,36 @@ class PracticeFragment : Fragment() {
         if (state.isHardStuck || state.aiTutorHint != null) {
             binding.cardAiTutorHint.isVisible = true
             binding.progressAiTutor.isVisible = state.isLoadingAiHint
-            binding.tvAiTutorHint.text = state.aiTutorHint ?: "Euler AI Tutor is diagnosing your 3 incorrect attempts..."
+            binding.tvAiTutorHint.text = state.aiTutorHint ?: "Locus AI Tutor is diagnosing your 3 incorrect attempts..."
         } else {
             binding.cardAiTutorHint.isVisible = false
+        }
+
+        // Prominent Centered Evaluation Feedback Overlay
+        if (state.lastSubmissionCorrect != null) {
+            binding.overlayEvaluationResult.isVisible = true
+            val isCorrect = state.lastSubmissionCorrect
+            if (isCorrect) {
+                binding.ivEvaluationStatus.setImageResource(R.drawable.ic_check_circle)
+                binding.tvEvaluationTitle.text = "Correct Solution!"
+                val delta = state.lastEloDelta ?: 0
+                val deltaSign = if (delta >= 0) "+$delta" else "$delta"
+                binding.tvEvaluationEloDelta.text = "$deltaSign Elo Rating (Now ${state.userElo})"
+                binding.tvEvaluationMessage.text = "Your solution matches the official Olympiad answer key. Outstanding precision."
+                binding.btnEvaluationNext.isVisible = true
+                binding.btnEvaluationRetry.isVisible = false
+            } else {
+                binding.ivEvaluationStatus.setImageResource(R.drawable.ic_cancel_circle)
+                binding.tvEvaluationTitle.text = "Incorrect Answer"
+                val delta = state.lastEloDelta ?: 0
+                val deltaSign = if (delta >= 0) "+$delta" else "$delta"
+                binding.tvEvaluationEloDelta.text = "$deltaSign Elo Rating"
+                binding.tvEvaluationMessage.text = "Re-examine your lemmas and calculations. Keep trying!"
+                binding.btnEvaluationNext.isVisible = false
+                binding.btnEvaluationRetry.isVisible = true
+            }
+        } else {
+            binding.overlayEvaluationResult.isVisible = false
         }
 
         // Feedback / Toast

@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LocusMathOlympiad"
+rootProject.name = "Locus"
 include(":app")

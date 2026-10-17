@@ -2,7 +2,6 @@ package com.locus.olympiad.ui.practice
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -11,7 +10,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.locus.olympiad.LocusApplication
 import com.locus.olympiad.R
 import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.databinding.ActivityPracticeBinding
@@ -27,6 +25,7 @@ class PracticeActivity : AppCompatActivity() {
     private val viewModel: PracticeViewModel by viewModels()
 
     private var currentRenderedQuestionId: Long? = null
+    private var currentTopic: MathTopic = MathTopic.COMBINATORICS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,13 +33,13 @@ class PracticeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val topicName = intent.getStringExtra(EXTRA_CATEGORY) ?: "Combinatorics"
-        val topic = MathTopic.fromString(topicName)
+        currentTopic = MathTopic.fromString(topicName)
 
-        setupListeners(topic)
+        setupListeners(currentTopic)
         observeState()
 
         if (savedInstanceState == null) {
-            viewModel.loadNextQuestion(topic)
+            viewModel.loadNextQuestion(currentTopic)
         }
     }
 
@@ -54,6 +53,17 @@ class PracticeActivity : AppCompatActivity() {
         binding.btnSubmitAnswer.setOnClickListener {
             val answer = binding.etAnswer.text?.toString().orEmpty()
             viewModel.submitAnswer(answer)
+        }
+
+        // Evaluation Result Modal Actions
+        binding.btnEvaluationNext.setOnClickListener {
+            viewModel.dismissEvaluationResult()
+            viewModel.loadNextQuestion(currentTopic)
+        }
+
+        binding.btnEvaluationRetry.setOnClickListener {
+            viewModel.dismissEvaluationResult()
+            binding.etAnswer.requestFocus()
         }
 
         // Quick Syntax Keypads
@@ -85,7 +95,7 @@ class PracticeActivity : AppCompatActivity() {
         binding.btnSubmitAnswer.isEnabled = !state.isEvaluatingAnswer
 
         // User Rating Badge
-        val topic = state.currentQuestion?.topic ?: MathTopic.COMBINATORICS
+        val topic = state.currentQuestion?.topic ?: currentTopic
         binding.tvTopicTitle.text = topic.displayName
         binding.tvEloBadge.text = "${state.userElo} [Master]"
 
@@ -133,9 +143,36 @@ class PracticeActivity : AppCompatActivity() {
         if (state.isHardStuck || state.aiTutorHint != null) {
             binding.cardAiTutorHint.isVisible = true
             binding.progressAiTutor.isVisible = state.isLoadingAiHint
-            binding.tvAiTutorHint.text = state.aiTutorHint ?: "Euler AI Tutor is diagnosing your 3 incorrect attempts..."
+            binding.tvAiTutorHint.text = state.aiTutorHint ?: "Locus AI Tutor is diagnosing your 3 incorrect attempts..."
         } else {
             binding.cardAiTutorHint.isVisible = false
+        }
+
+        // Prominent Centered Evaluation Feedback Overlay
+        if (state.lastSubmissionCorrect != null) {
+            binding.overlayEvaluationResult.isVisible = true
+            val isCorrect = state.lastSubmissionCorrect
+            if (isCorrect) {
+                binding.ivEvaluationStatus.setImageResource(R.drawable.ic_check_circle)
+                binding.tvEvaluationTitle.text = "Correct Solution!"
+                val delta = state.lastEloDelta ?: 0
+                val deltaSign = if (delta >= 0) "+$delta" else "$delta"
+                binding.tvEvaluationEloDelta.text = "$deltaSign Elo Rating (Now ${state.userElo})"
+                binding.tvEvaluationMessage.text = "Your solution matches the official Olympiad answer key. Outstanding precision."
+                binding.btnEvaluationNext.isVisible = true
+                binding.btnEvaluationRetry.isVisible = false
+            } else {
+                binding.ivEvaluationStatus.setImageResource(R.drawable.ic_cancel_circle)
+                binding.tvEvaluationTitle.text = "Incorrect Answer"
+                val delta = state.lastEloDelta ?: 0
+                val deltaSign = if (delta >= 0) "+$delta" else "$delta"
+                binding.tvEvaluationEloDelta.text = "$deltaSign Elo Rating"
+                binding.tvEvaluationMessage.text = "Re-examine your lemmas and calculations. Keep trying!"
+                binding.btnEvaluationNext.isVisible = false
+                binding.btnEvaluationRetry.isVisible = true
+            }
+        } else {
+            binding.overlayEvaluationResult.isVisible = false
         }
 
         // Feedback / Toast

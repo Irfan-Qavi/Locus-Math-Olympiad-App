@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.locus.olympiad.R
 import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.databinding.ActivityDashboardBinding
+import com.locus.olympiad.ui.onboarding.OnboardingDialog
 import com.locus.olympiad.viewmodel.DashboardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -37,8 +38,21 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        checkOnboarding()
         setupListeners()
         observeState()
+    }
+
+    private fun checkOnboarding() {
+        if (!viewModel.hasCompletedOnboarding()) {
+            val existing = childFragmentManager.findFragmentByTag(OnboardingDialog.TAG)
+            if (existing == null) {
+                val dialog = OnboardingDialog.newInstance { chosenName ->
+                    viewModel.setUserName(chosenName)
+                }
+                dialog.show(childFragmentManager, OnboardingDialog.TAG)
+            }
+        }
     }
 
     private fun setupListeners() {
@@ -66,7 +80,11 @@ class DashboardFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     binding.tvOverallElo.text = "%,d".format(state.overallElo)
-                    binding.tvMasterBadge.text = "${state.overallElo} [Master]"
+                    binding.tvMasterBadge.text = "${state.overallElo} [${state.rankTitle}]"
+
+                    binding.tvUserInitial.text = state.userInitial
+                    binding.tvGreeting.text = "Welcome, ${state.userName}"
+                    binding.tvUserRank.text = state.rankTitle
 
                     binding.tvCombinatoricsElo.text = "${state.combinatoricsElo} Elo"
                     binding.tvAlgebraElo.text = "${state.algebraElo} Elo"

@@ -2,6 +2,7 @@ package com.locus.olympiad
 
 import android.app.Application
 import com.locus.olympiad.data.LocusDatabase
+import com.locus.olympiad.data.UserPreferencesRepository
 import com.locus.olympiad.network.AiTutorClient
 import com.locus.olympiad.repository.AiTutorRepositoryImpl
 import com.locus.olympiad.repository.MatchmakingRepositoryImpl
@@ -13,6 +14,10 @@ class LocusApplication : Application() {
 
     val database: LocusDatabase by lazy {
         LocusDatabase.getInstance(this)
+    }
+
+    val userPreferencesRepository: UserPreferencesRepository by lazy {
+        UserPreferencesRepository(this)
     }
 
     val matchmakingRepository: MatchmakingRepositoryImpl by lazy {
@@ -34,7 +39,8 @@ class LocusApplication : Application() {
     val viewModelFactory: ViewModelFactory by lazy {
         ViewModelFactory(
             matchmakingRepository = matchmakingRepository,
-            aiTutorRepository = aiTutorRepository
+            aiTutorRepository = aiTutorRepository,
+            userPreferencesRepository = userPreferencesRepository
         )
     }
 }
