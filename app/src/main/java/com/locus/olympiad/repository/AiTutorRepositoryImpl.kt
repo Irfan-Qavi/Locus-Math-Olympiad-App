@@ -1,6 +1,6 @@
 package com.locus.olympiad.repository
 
-import com.google.code.gson.JsonParser
+import com.google.gson.JsonParser
 import com.locus.olympiad.data.model.PracticeQuestion
 import com.locus.olympiad.domain.ai.AiTutorPromptBuilder
 import com.locus.olympiad.domain.ai.AiTutorRepository
