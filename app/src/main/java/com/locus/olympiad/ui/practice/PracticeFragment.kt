@@ -5,7 +5,6 @@ import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -14,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.locus.olympiad.R
 import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.data.model.PracticeSessionConfig
@@ -47,24 +47,33 @@ class PracticeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val config = (arguments?.getSerializable(EXTRA_CONFIG) as? PracticeSessionConfig)
-            ?: run {
-                val topicName = arguments?.getString("category")
-                val topic = topicName?.let { MathTopic.fromString(it) }
-                PracticeSessionConfig(topic = topic)
-            }
+        val shouldResume = arguments?.getBoolean("resume_session", false) ?: false
 
         setupListeners()
         observeState()
 
         if (savedInstanceState == null) {
-            viewModel.startSession(config)
+            if (shouldResume) {
+                viewModel.resumeSession()
+            } else {
+                val config = (arguments?.getSerializable(EXTRA_CONFIG) as? PracticeSessionConfig)
+                    ?: run {
+                        val topicName = arguments?.getString("category")
+                        val topic = topicName?.let { MathTopic.fromString(it) }
+                        PracticeSessionConfig(topic = topic)
+                    }
+                viewModel.startSession(config)
+            }
         }
     }
 
     private fun setupListeners() {
         binding.btnBack.setOnClickListener {
-            navigateBack()
+            showEndPracticeDialog()
+        }
+
+        binding.btnEndPractice.setOnClickListener {
+            showEndPracticeDialog()
         }
 
         binding.btnSubmitAnswer.setOnClickListener {
@@ -72,17 +81,26 @@ class PracticeFragment : Fragment() {
             viewModel.submitAnswer(answer)
         }
 
-        // Subjective Type B (Prove That) Listeners
-        binding.btnSolveProof.setOnClickListener {
-            viewModel.revealProofSolution()
+        // Feature 1: Show Answer
+        binding.btnShowAnswer.setOnClickListener {
+            viewModel.showAnswer()
         }
 
-        binding.btnProofValid.setOnClickListener {
-            viewModel.submitProofSelfEvaluation(true)
+        binding.btnRevealedNext.setOnClickListener {
+            viewModel.proceedToNextQuestion()
         }
 
-        binding.btnProofIncomplete.setOnClickListener {
-            viewModel.submitProofSelfEvaluation(false)
+        // Feature 4: Streamlined Subjective Proof Choices
+        binding.btnProofSolved.setOnClickListener {
+            viewModel.handleProofEvaluation(true)
+        }
+
+        binding.btnProofUnsolved.setOnClickListener {
+            viewModel.handleProofEvaluation(false)
+        }
+
+        binding.btnProofNext.setOnClickListener {
+            viewModel.proceedToNextQuestion()
         }
 
         // Evaluation Result Modal Actions
@@ -115,6 +133,20 @@ class PracticeFragment : Fragment() {
         }
     }
 
+    private fun showEndPracticeDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("End Practice Session?")
+            .setMessage("Are you sure you want to end this practice session? Your progress will be concluded with 0 penalty.")
+            .setPositiveButton("End Practice") { dialog, _ ->
+                dialog.dismiss()
+                viewModel.endPractice()
+            }
+            .setNegativeButton("Continue Practicing") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
     private fun navigateBack() {
         if (!findNavController().navigateUp()) {
             requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -137,7 +169,7 @@ class PracticeFragment : Fragment() {
         binding.progressLoading.isVisible = state.isLoadingQuestion || state.isEvaluatingAnswer
         binding.btnSubmitAnswer.isEnabled = !state.isEvaluatingAnswer
 
-        // Session Config & User Rating Badge
+        // Session Config & Dynamic User Rating Badge (Bug 2 fix)
         val topic = state.currentQuestion?.topic ?: state.sessionConfig.topic
         binding.tvTopicTitle.text = topic?.displayName ?: state.sessionConfig.topicDisplayName
         binding.tvEloBadge.text = "${state.userElo} [Master]"
@@ -168,27 +200,56 @@ class PracticeFragment : Fragment() {
             // Split UI Engine based on QuestionType
             when (qType) {
                 QuestionType.OBJECTIVE -> {
-                    binding.containerAnswerInput.isVisible = true
-                    binding.btnSolveProof.isVisible = false
+                    binding.containerProofChoices.isVisible = false
                     binding.cardProofSolution.isVisible = false
-                    binding.tvAnswerFormatNote.isVisible = true
-                    binding.tvAnswerFormatNote.text = "Answer must be strictly between 0 and 99"
-                    binding.etAnswer.inputType = InputType.TYPE_CLASS_NUMBER
-                    binding.containerQuickKeys.isVisible = false
+
+                    if (state.isAnswerRevealed) {
+                        binding.containerAnswerInput.isVisible = false
+                        binding.cardRevealedAnswer.isVisible = true
+                        binding.tvRevealedAnswerValue.text = question.correctAnswer
+                        val delta = state.lastEloDelta ?: 0
+                        binding.tvRevealedPenaltyNote.text = if (state.sessionConfig.isRiskFree) {
+                            "Risk-Free Mode: 0 Elo penalty applied"
+                        } else {
+                            "Penalty applied: $delta Elo"
+                        }
+                    } else {
+                        binding.containerAnswerInput.isVisible = true
+                        binding.cardRevealedAnswer.isVisible = false
+                        binding.tvAnswerFormatNote.isVisible = true
+                        binding.tvAnswerFormatNote.text = "Answer must be strictly between 0 and 99"
+                        binding.etAnswer.inputType = InputType.TYPE_CLASS_NUMBER
+                        binding.containerQuickKeys.isVisible = false
+                    }
                 }
                 QuestionType.SUBJECTIVE_SHORT -> {
-                    binding.containerAnswerInput.isVisible = true
-                    binding.btnSolveProof.isVisible = false
+                    binding.containerProofChoices.isVisible = false
                     binding.cardProofSolution.isVisible = false
-                    binding.tvAnswerFormatNote.isVisible = true
-                    binding.tvAnswerFormatNote.text = "Semantic AI evaluation enabled. Phrasing variations accepted."
-                    binding.etAnswer.inputType = InputType.TYPE_CLASS_TEXT
-                    binding.containerQuickKeys.isVisible = false
+
+                    if (state.isAnswerRevealed) {
+                        binding.containerAnswerInput.isVisible = false
+                        binding.cardRevealedAnswer.isVisible = true
+                        binding.tvRevealedAnswerValue.text = question.correctAnswer
+                        val delta = state.lastEloDelta ?: 0
+                        binding.tvRevealedPenaltyNote.text = if (state.sessionConfig.isRiskFree) {
+                            "Risk-Free Mode: 0 Elo penalty applied"
+                        } else {
+                            "Penalty applied: $delta Elo"
+                        }
+                    } else {
+                        binding.containerAnswerInput.isVisible = true
+                        binding.cardRevealedAnswer.isVisible = false
+                        binding.tvAnswerFormatNote.isVisible = true
+                        binding.tvAnswerFormatNote.text = "Semantic AI evaluation enabled. Phrasing variations accepted."
+                        binding.etAnswer.inputType = InputType.TYPE_CLASS_TEXT
+                        binding.containerQuickKeys.isVisible = false
+                    }
                 }
                 QuestionType.SUBJECTIVE_PROOF -> {
                     binding.containerAnswerInput.isVisible = false
+                    binding.cardRevealedAnswer.isVisible = false
                     binding.tvAnswerFormatNote.isVisible = false
-                    binding.btnSolveProof.isVisible = !state.isProofSolutionRevealed
+                    binding.containerProofChoices.isVisible = !state.isProofSolutionRevealed
                     binding.cardProofSolution.isVisible = state.isProofSolutionRevealed
 
                     if (state.isProofSolutionRevealed && currentRenderedProofId != question.id) {
@@ -220,7 +281,7 @@ class PracticeFragment : Fragment() {
                 binding.tvEvaluationTitle.text = "Correct Solution!"
                 val delta = state.lastEloDelta ?: 0
                 val deltaSign = if (delta >= 0) "+$delta" else "$delta"
-                binding.tvEvaluationEloDelta.text = if (state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF) {
+                binding.tvEvaluationEloDelta.text = if (state.sessionConfig.isRiskFree || state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF) {
                     "Neutral Rating (0 Elo Delta)"
                 } else {
                     "$deltaSign Elo Rating (Now ${state.userElo})"
@@ -233,7 +294,7 @@ class PracticeFragment : Fragment() {
                 binding.tvEvaluationTitle.text = if (state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF) "Proof Under Review" else "Incorrect Answer"
                 val delta = state.lastEloDelta ?: 0
                 val deltaSign = if (delta >= 0) "+$delta" else "$delta"
-                binding.tvEvaluationEloDelta.text = if (state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF) "Neutral Rating (0 Elo Delta)" else "$deltaSign Elo Rating"
+                binding.tvEvaluationEloDelta.text = if (state.sessionConfig.isRiskFree || state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF) "Neutral Rating (0 Elo Delta)" else "$deltaSign Elo Rating"
                 binding.tvEvaluationMessage.text = state.feedbackMessage ?: "Re-examine your lemmas and calculations. Keep trying!"
                 binding.btnEvaluationNext.isVisible = state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF
                 binding.btnEvaluationRetry.isVisible = state.currentQuestion?.resolvedType != QuestionType.SUBJECTIVE_PROOF
@@ -245,10 +306,10 @@ class PracticeFragment : Fragment() {
         // Session Complete Overlay
         if (state.isSessionCompleted) {
             binding.overlaySessionComplete.isVisible = true
-            binding.tvSessionSummary.text = "You solved ${state.sessionSolvedCount} out of ${state.sessionConfig.questionCount} problems."
+            binding.tvSessionSummary.text = "You completed ${state.sessionSolvedCount} problem(s)."
             val netDelta = state.sessionNetEloDelta
             val netSign = if (netDelta >= 0) "+$netDelta" else "$netDelta"
-            binding.tvSessionNetElo.text = "Net Rating: $netSign Elo"
+            binding.tvSessionNetElo.text = if (state.sessionConfig.isRiskFree) "Rating: Unchanged (Risk-Free Mode)" else "Net Rating: $netSign Elo"
         } else {
             binding.overlaySessionComplete.isVisible = false
         }

@@ -2,10 +2,12 @@ package com.locus.olympiad.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.locus.olympiad.data.UserPreferencesRepository
 import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.data.model.PracticeQuestion
 import com.locus.olympiad.data.model.PracticeSessionConfig
 import com.locus.olympiad.data.model.QuestionType
+import com.locus.olympiad.data.model.UserTopicProfile
 import com.locus.olympiad.domain.ai.AiTutorRepository
 import com.locus.olympiad.repository.MatchmakingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,11 +21,35 @@ import javax.inject.Inject
 @HiltViewModel
 class PracticeViewModel @Inject constructor(
     private val matchmakingRepository: MatchmakingRepository,
-    private val aiTutorRepository: AiTutorRepository
+    private val aiTutorRepository: AiTutorRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PracticeUiState())
     val uiState: StateFlow<PracticeUiState> = _uiState.asStateFlow()
+
+    init {
+        observeUserElo()
+    }
+
+    /**
+     * Dynamically collects user Elo rating from repository/database flow,
+     * ensuring header badge updates immediately without desynchronization.
+     */
+    private fun observeUserElo() {
+        viewModelScope.launch {
+            matchmakingRepository.getAllUserProfiles().collect { profiles ->
+                val topic = _uiState.value.sessionConfig.topic
+                val rating = if (topic != null) {
+                    profiles.find { it.category.equals(topic.displayName, ignoreCase = true) }?.eloRating
+                        ?: UserTopicProfile.DEFAULT_ELO
+                } else {
+                    if (profiles.isNotEmpty()) profiles.map { it.eloRating }.average().toInt() else UserTopicProfile.DEFAULT_ELO
+                }
+                _uiState.update { it.copy(userElo = rating) }
+            }
+        }
+    }
 
     /**
      * Initializes a new practice session with the user-selected configurator options.
@@ -39,10 +65,50 @@ class PracticeViewModel @Inject constructor(
                 incorrectAttempts = emptyList(),
                 lastSubmissionCorrect = null,
                 lastEloDelta = null,
-                isProofSolutionRevealed = false
+                isProofSolutionRevealed = false,
+                isAnswerRevealed = false
             )
         }
+        saveCurrentSessionState()
         loadNextQuestion(config.topic)
+    }
+
+    /**
+     * Resumes an active practice session from persistent storage.
+     */
+    fun resumeSession() {
+        val active = userPreferencesRepository.getActiveSession() ?: return
+        val config = PracticeSessionConfig(
+            topic = active.topic,
+            difficultyTier = active.difficultyTier,
+            questionCount = active.questionCount,
+            isRiskFree = active.isRiskFree
+        )
+        _uiState.update {
+            it.copy(
+                sessionConfig = config,
+                sessionQuestionIndex = active.questionIndex,
+                sessionSolvedCount = active.solvedCount,
+                sessionNetEloDelta = active.netEloDelta,
+                isSessionCompleted = false,
+                incorrectAttempts = emptyList(),
+                lastSubmissionCorrect = null,
+                lastEloDelta = null,
+                isProofSolutionRevealed = false,
+                isAnswerRevealed = false
+            )
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingQuestion = true) }
+            val qId = active.currentQuestionId
+            val question = if (qId != null) matchmakingRepository.getQuestionById(qId) else null
+            if (question != null) {
+                _uiState.update { it.copy(currentQuestion = question, isLoadingQuestion = false) }
+            } else {
+                loadNextQuestion(config.topic)
+            }
+        }
     }
 
     /**
@@ -54,6 +120,7 @@ class PracticeViewModel @Inject constructor(
         val currentIndex = _uiState.value.sessionQuestionIndex
 
         if (!config.isEndless && currentIndex >= config.questionCount) {
+            userPreferencesRepository.clearActiveSession()
             _uiState.update {
                 it.copy(
                     isSessionCompleted = true,
@@ -67,9 +134,11 @@ class PracticeViewModel @Inject constructor(
                     sessionQuestionIndex = currentIndex + 1,
                     lastSubmissionCorrect = null,
                     lastEloDelta = null,
-                    isProofSolutionRevealed = false
+                    isProofSolutionRevealed = false,
+                    isAnswerRevealed = false
                 )
             }
+            saveCurrentSessionState()
             loadNextQuestion(config.topic)
         }
     }
@@ -93,9 +162,11 @@ class PracticeViewModel @Inject constructor(
                             lastEloDelta = null,
                             userDraftAnswer = "",
                             feedbackMessage = null,
-                            isProofSolutionRevealed = false
+                            isProofSolutionRevealed = false,
+                            isAnswerRevealed = false
                         )
                     }
+                    saveCurrentSessionState()
                 } else {
                     _uiState.update {
                         it.copy(
@@ -137,46 +208,94 @@ class PracticeViewModel @Inject constructor(
     }
 
     /**
-     * Reveals the official proof solution for Subjective Proof questions.
+     * Surrenders the active question, applies a 1.1x incorrect penalty (or 0 if Risk-Free),
+     * reveals the official answer, and transitions the UI to show only the "Next Question" button.
      */
-    fun revealProofSolution() {
-        _uiState.update { it.copy(isProofSolutionRevealed = true) }
-    }
-
-    /**
-     * Submits self-evaluation for Subjective Proof problems (True = Valid proof, False = Incomplete).
-     */
-    fun submitProofSelfEvaluation(isValidProof: Boolean) {
+    fun showAnswer() {
         val question = _uiState.value.currentQuestion ?: return
+        if (_uiState.value.isAnswerRevealed) return
+
         viewModelScope.launch {
             _uiState.update { it.copy(isEvaluatingAnswer = true) }
             try {
-                val answerString = if (isValidProof) "PROVED" else "INCOMPLETE"
-                val (isCorrect, eloResult) = matchmakingRepository.submitAnswer(
+                val isRiskFree = _uiState.value.sessionConfig.isRiskFree
+                val (_, eloResult) = matchmakingRepository.submitAnswer(
                     question = question,
-                    submittedAnswer = answerString
+                    submittedAnswer = "SHOW_ANSWER",
+                    isRiskFree = isRiskFree,
+                    isShowAnswerPenalty = true
                 )
 
                 _uiState.update { current ->
                     current.copy(
                         userElo = eloResult.newElo,
-                        lastSubmissionCorrect = isCorrect,
+                        lastSubmissionCorrect = null,
                         lastEloDelta = eloResult.delta,
-                        sessionSolvedCount = if (isCorrect) current.sessionSolvedCount + 1 else current.sessionSolvedCount,
                         sessionNetEloDelta = current.sessionNetEloDelta + eloResult.delta,
                         isEvaluatingAnswer = false,
-                        feedbackMessage = if (isCorrect) "Proof self-validated as correct." else "Proof marked incomplete for review."
+                        isAnswerRevealed = true,
+                        feedbackMessage = if (isRiskFree) {
+                            "Official answer revealed (Risk-Free Mode: 0 Elo penalty applied)."
+                        } else {
+                            "Official answer revealed (${eloResult.delta} Elo penalty applied)."
+                        }
                     )
                 }
+                saveCurrentSessionState()
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isEvaluatingAnswer = false,
-                        errorMessage = "Self-evaluation failed: ${e.localizedMessage}"
+                        errorMessage = "Failed to reveal answer: ${e.localizedMessage}"
                     )
                 }
             }
         }
+    }
+
+    /**
+     * Handles subjective proof evaluation ("I HAVE SOLVED IT" vs "I COULDN'T SOLVE IT").
+     * Subjective proof carries neutral rating (0 Elo delta).
+     * Reveals the full proof and displays only the Next Question button.
+     */
+    fun handleProofEvaluation(isValidProof: Boolean) {
+        val question = _uiState.value.currentQuestion ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isEvaluatingAnswer = true) }
+            try {
+                val answerString = if (isValidProof) "SOLVED" else "UNSOLVED"
+                val (isCorrect, eloResult) = matchmakingRepository.submitAnswer(
+                    question = question,
+                    submittedAnswer = answerString,
+                    isRiskFree = _uiState.value.sessionConfig.isRiskFree
+                )
+
+                _uiState.update { current ->
+                    current.copy(
+                        userElo = eloResult.newElo,
+                        lastSubmissionCorrect = null,
+                        lastEloDelta = 0,
+                        sessionSolvedCount = if (isValidProof) current.sessionSolvedCount + 1 else current.sessionSolvedCount,
+                        sessionNetEloDelta = current.sessionNetEloDelta + eloResult.delta,
+                        isEvaluatingAnswer = false,
+                        isProofSolutionRevealed = true,
+                        feedbackMessage = if (isValidProof) "Proof marked as solved." else "Official solution revealed for review."
+                    )
+                }
+                saveCurrentSessionState()
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isEvaluatingAnswer = false,
+                        errorMessage = "Proof evaluation failed: ${e.localizedMessage}"
+                    )
+                }
+            }
+        }
+    }
+
+    fun submitProofSelfEvaluation(isValidProof: Boolean) {
+        handleProofEvaluation(isValidProof)
     }
 
     /**
@@ -199,10 +318,12 @@ class PracticeViewModel @Inject constructor(
                     semanticCorrect = aiResult.getOrNull()
                 }
 
+                val isRiskFree = _uiState.value.sessionConfig.isRiskFree
                 val (isCorrect, eloResult) = matchmakingRepository.submitAnswer(
                     question = question,
                     submittedAnswer = trimmedAnswer,
-                    isSemanticCorrect = semanticCorrect
+                    isSemanticCorrect = semanticCorrect,
+                    isRiskFree = isRiskFree
                 )
 
                 if (isCorrect) {
@@ -214,7 +335,11 @@ class PracticeViewModel @Inject constructor(
                             sessionSolvedCount = current.sessionSolvedCount + 1,
                             sessionNetEloDelta = current.sessionNetEloDelta + eloResult.delta,
                             isEvaluatingAnswer = false,
-                            feedbackMessage = "Correct! Master Elo increased by +${eloResult.delta} pts (${eloResult.newElo}).",
+                            feedbackMessage = if (isRiskFree) {
+                                "Correct! (Risk-Free Mode: 0 Elo delta)."
+                            } else {
+                                "Correct! Master Elo increased by +${eloResult.delta} pts (${eloResult.newElo})."
+                            },
                             incorrectAttempts = emptyList()
                         )
                     }
@@ -227,11 +352,16 @@ class PracticeViewModel @Inject constructor(
                             lastEloDelta = eloResult.delta,
                             sessionNetEloDelta = current.sessionNetEloDelta + eloResult.delta,
                             isEvaluatingAnswer = false,
-                            feedbackMessage = "Incorrect (${eloResult.delta} pts). Re-examine your lemmas.",
+                            feedbackMessage = if (isRiskFree) {
+                                "Incorrect (Risk-Free Mode: 0 Elo delta). Re-examine your lemmas."
+                            } else {
+                                "Incorrect (${eloResult.delta} pts). Re-examine your lemmas."
+                            },
                             incorrectAttempts = updatedAttempts
                         )
                     }
                 }
+                saveCurrentSessionState()
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
@@ -244,6 +374,21 @@ class PracticeViewModel @Inject constructor(
     }
 
     /**
+     * Concludes the practice session cleanly with 0 penalty, clears active session state,
+     * and reports the session summary overlay.
+     */
+    fun endPractice() {
+        userPreferencesRepository.clearActiveSession()
+        _uiState.update {
+            it.copy(
+                isSessionCompleted = true,
+                lastSubmissionCorrect = null,
+                lastEloDelta = null
+            )
+        }
+    }
+
+    /**
      * Dismisses the evaluation feedback overlay and allows retrying or reviewing the question.
      */
     fun dismissEvaluationResult() {
@@ -251,6 +396,19 @@ class PracticeViewModel @Inject constructor(
             it.copy(
                 lastSubmissionCorrect = null,
                 lastEloDelta = null
+            )
+        }
+    }
+
+    private fun saveCurrentSessionState() {
+        val state = _uiState.value
+        if (!state.isSessionCompleted) {
+            userPreferencesRepository.saveActiveSession(
+                config = state.sessionConfig,
+                questionIndex = state.sessionQuestionIndex,
+                solvedCount = state.sessionSolvedCount,
+                netEloDelta = state.sessionNetEloDelta,
+                currentQuestionId = state.currentQuestion?.id
             )
         }
     }

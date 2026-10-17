@@ -28,14 +28,16 @@ data class PracticeUiState(
     val userDraftAnswer: String = "",
     val feedbackMessage: String? = null,
     val errorMessage: String? = null,
-    val isProofSolutionRevealed: Boolean = false
+    val isProofSolutionRevealed: Boolean = false,
+    val isAnswerRevealed: Boolean = false
 ) {
     val sessionProgressText: String
         get() {
+            val riskStr = if (sessionConfig.isRiskFree) " [Risk-Free]" else ""
             return if (sessionConfig.isEndless) {
-                "Problem #$sessionQuestionIndex • Endless"
+                "Problem #$sessionQuestionIndex • Endless$riskStr"
             } else {
-                "Problem $sessionQuestionIndex of ${sessionConfig.questionCount}"
+                "Problem $sessionQuestionIndex of ${sessionConfig.questionCount}$riskStr"
             }
         }
 }

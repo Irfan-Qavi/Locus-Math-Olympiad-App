@@ -77,18 +77,23 @@ class KatexWebView @JvmOverloads constructor(
         isHorizontalScrollBarEnabled = false
     }
 
+    private var lastReportedHeightPx = -1
+
     private fun setupResizeBridge() {
         val bridge = MathResizeBridge { calculatedHeightDp ->
             post {
                 val density = resources.displayMetrics.density
                 val heightPx = (calculatedHeightDp * density).toInt()
-                if (layoutParams != null) {
-                    layoutParams.height = heightPx
-                    requestLayout()
-                } else {
-                    layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)
+                if (Math.abs(lastReportedHeightPx - heightPx) > 4) {
+                    lastReportedHeightPx = heightPx
+                    if (layoutParams != null) {
+                        layoutParams.height = heightPx
+                        requestLayout()
+                    } else {
+                        layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)
+                    }
+                    onHeightChangedListener?.invoke(heightPx)
                 }
-                onHeightChangedListener?.invoke(heightPx)
             }
         }
         addJavascriptInterface(bridge, "Android")
@@ -155,6 +160,7 @@ class KatexWebView @JvmOverloads constructor(
      * Renders LaTeX content using the bundled KaTeX engine and CMU Serif configuration wrapper.
      */
     fun setLatexContent(latexContent: String) {
+        lastReportedHeightPx = -1
         val processed = preprocessLatexDocument(latexContent)
         var wrappedHtml = HTML_TEMPLATE.replace("{LATEX_CONTENT_PLACEHOLDER}", processed).trim()
         if (!wrappedHtml.startsWith("<!DOCTYPE html>", ignoreCase = true)) {
@@ -174,13 +180,28 @@ class KatexWebView @JvmOverloads constructor(
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="file:///android_asset/katex/katex.min.css">
     <script src="file:///android_asset/katex/katex.min.js"></script>
     <script src="file:///android_asset/katex/contrib/auto-render.min.js"></script>
     <style>
         * { box-sizing: border-box; }
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: auto !important;
+            min-height: 0 !important;
+            display: inline-block;
+            width: 100%;
+            overflow: hidden;
+        }
         body {
+            margin: 0;
+            padding: 0;
+            height: auto !important;
+            min-height: 0 !important;
+            display: inline-block;
+            overflow: hidden;
             opacity: 0;
             transition: opacity 0.25s ease-in;
             background-color: #121212;
@@ -188,10 +209,6 @@ class KatexWebView @JvmOverloads constructor(
             font-family: "KaTeX_Main", "Times New Roman", serif !important;
             font-size: 17px;
             line-height: 1.6;
-            margin: 0;
-            padding: 12px 14px 28px 14px;
-            overflow-y: hidden;
-            overflow-x: auto;
         }
         @media (prefers-color-scheme: dark) {
             html, body {
@@ -205,13 +222,14 @@ class KatexWebView @JvmOverloads constructor(
         #content {
             white-space: pre-wrap;
             word-wrap: break-word;
-            padding-bottom: 24px;
+            margin: 0;
+            padding: 2px 4px;
         }
         .katex-display {
             overflow-x: auto;
             overflow-y: hidden;
-            padding: 6px 0;
-            margin: 10px 0;
+            padding: 4px 0;
+            margin: 8px 0;
         }
         /* Structural document macros */
         .latex-section {
@@ -263,21 +281,15 @@ class KatexWebView @JvmOverloads constructor(
 <body>
     <div id="content">{LATEX_CONTENT_PLACEHOLDER}</div>
     <script>
-        function sendHeight() {
-            var content = document.getElementById("content");
-            var height = Math.max(
-                document.documentElement.scrollHeight || 0,
-                document.body.scrollHeight || 0,
-                content ? content.offsetHeight + 40 : 0
-            );
+        var heightSent = false;
+        function sendHeightOnce() {
+            if (heightSent) return;
+            heightSent = true;
+            document.body.style.opacity = "1";
+            var height = document.body.scrollHeight || document.documentElement.scrollHeight || 0;
             if (window.Android && window.Android.setHeight) {
                 window.Android.setHeight(height);
             }
-        }
-
-        function makeVisible() {
-            document.body.style.opacity = "1";
-            sendHeight();
         }
 
         document.addEventListener("DOMContentLoaded", function() {
@@ -310,21 +322,19 @@ class KatexWebView @JvmOverloads constructor(
 
             if (document.fonts && document.fonts.ready) {
                 document.fonts.ready.then(function() {
-                    makeVisible();
-                    setTimeout(sendHeight, 100);
+                    sendHeightOnce();
                 }).catch(function() {
-                    makeVisible();
+                    sendHeightOnce();
                 });
             } else {
-                makeVisible();
+                sendHeightOnce();
             }
 
-            // Fallback timeout to ensure visibility is never permanently blocked
-            setTimeout(makeVisible, 400);
+            setTimeout(sendHeightOnce, 350);
         });
 
         window.addEventListener("load", function() {
-            makeVisible();
+            sendHeightOnce();
         });
     </script>
 </body>

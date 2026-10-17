@@ -22,27 +22,29 @@ Built using **Modern Android Architecture (MVVM + Clean Architecture)**, the app
 - **Dynamic Logistic Curve**: Uses standard FIDE/logistic rating updates with adaptive K-factors based on student experience.
 - **Matchmaking Window**: Matches problems within a $\pm 150$ Elo window of the user's current rating, with nearest-neighbor fallback.
 - **Configurable Practice Sessions**: Allows students to configure target topic, difficulty tiers (Foundational, Intermediate, Olympiad), and problem counts (5, 10, 15, or Endless mode) without distraction from artificial timers.
+- **Risk-Free Practice Mode**: Option to train in sandbox mode where rating delta is strictly 0 for all answers, allowing stress-free problem exploration.
+- **Show Answer Functionality**: Instant surrender option deducting a standard 1.1x penalty (or 0 in Risk-Free Mode), revealing the official answer and transitioning directly to the next question.
 
-### 2. Offline KaTeX Mathematical Rendering & Structural Macros
-- **100% Offline Asset Bundling**: KaTeX JavaScript, CSS stylesheets, and all 20 WOFF2/TTF Computer Modern font binaries are bundled locally in the application assets, eliminating CDN latency and enabling offline functionality.
+### 2. Offline KaTeX Mathematical Rendering & Layout Engine
+- **100% Offline Asset Bundling**: KaTeX JavaScript, CSS stylesheets, and all 20 WOFF2/TTF Computer Modern font binaries are bundled locally in application assets, eliminating CDN latency.
 - **Zero FOUC (Flash of Unstyled Content)**: Views initialize with zero opacity and smoothly transition to full visibility only after equation rendering and font layout are complete.
 - **Structural Environment Macros**: Extends KaTeX rendering with custom structural environments, rendering `\section{}`, `\subsection{}`, `\begin{theorem}...\end{theorem}`, and `\begin{lemma}...\end{lemma}` as styled academic cards with accent borders and distinct backgrounds.
-- **Dynamic Auto-Sizing**: Bidirectional JavaScript-Android bridge dynamically recalculates document height to prevent tall equations, fractions, and matrices from clipping.
+- **Single-Shot Layout Measuring**: Prevents infinite measuring loops and eliminates phantom WebKit margins through strict viewport metadata, bounded scrollHeight calculations, and thresholded Android layout updates.
 
 ### 3. Dual Problem Evaluation Engine (Objective & Subjective)
 - **Objective Grading**: Evaluates numerical, modular, and short integer responses directly against verified answer keys.
 - **Subjective Short-Answer Semantic Grading**: Employs an LLM grading prompt to accept mathematically equivalent answers regardless of student phrasing (e.g., recognizing "Such a configuration does not exist", "0 solutions", "None", and "Impossible" as strictly equivalent).
-- **Subjective Proof Validation**: Presents full official Olympiad proofs with structured lemmas, allowing students to compare proofs and perform structured self-validation without rating penalties.
+- **Streamlined Subjective Proof Validation**: Two-step proof workflow ("I HAVE SOLVED IT" vs "I COULDN'T SOLVE IT") immediately revealing the full canonical proof with a single "Next Problem" button and neutral rating impact.
 
 ### 4. Database Pre-population & Seed Data
 - Pre-loaded with authentic **IOQM / RMO / INMO** questions across all 4 categories directly from `assets/questions_seed.json`.
 - Streamed in memory-safe chunks and automatically seeded on the very first launch via Room's database lifecycle callback.
 
-### 5. Jetpack Navigation & Bottom Navigation
-- Full Jetpack Navigation Graph routing between:
-  - **Dashboard**: Radar profile, aggregate Elo, topic rating breakdown, and quick action cards.
-  - **Practice Arena**: Interactive math arena with offline KaTeX WebView, quick-syntax keypad, and centered evaluation overlays.
-  - **Theory Monographs**: Academic theory reader covering advanced lemmas (e.g., Alon's Nullstellensatz, Vieta Jumping, Barycentric Coordinates).
+### 5. Jetpack Navigation, Session Lifecycle & Interruption Safety
+- **Full Jetpack Navigation Graph**: Configured with single-top routing (`launchSingleTop = true`) and `popUpTo` state restoration, avoiding backstack duplication between Dashboard, Practice, and Theory.
+- **Practice Tab Interception**: Bottom dock Practice tab intercepts navigation to launch the pre-practice configurator bottom sheet.
+- **Session Lifecycle Protection**: Active session state is persisted across app minimizes and back presses. If navigating away during an active session, users are prompted to either continue practicing or stop the session.
+- **Explicit End Practice**: Toolbar action allowing clean conclusion of an active session with 0 penalty and instant session summary reporting.
 
 ## Architecture & Tech Stack
 

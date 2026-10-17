@@ -76,10 +76,13 @@ class PracticeConfigBottomSheet() : BottomSheetDialogFragment() {
                 else -> 10
             }
 
+            val isRiskFree = binding.switchRiskFree.isChecked
+
             val config = PracticeSessionConfig(
                 topic = selectedTopic,
                 difficultyTier = difficultyTier,
-                questionCount = questionCount
+                questionCount = questionCount,
+                isRiskFree = isRiskFree
             )
 
             onConfigSelected?.invoke(config)

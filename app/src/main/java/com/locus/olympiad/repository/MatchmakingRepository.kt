@@ -31,17 +31,27 @@ interface MatchmakingRepository {
     ): PracticeQuestion?
 
     /**
+     * Retrieves a specific question by its database ID, used for session restoration.
+     */
+    suspend fun getQuestionById(questionId: Long): PracticeQuestion?
+
+    /**
      * Validates a user's answer submission, computes new Elo using standard Elo math,
      * updates the database, and returns the calculation result.
      * 
      * @param question The question being answered.
      * @param submittedAnswer The user's input answer string.
+     * @param isSemanticCorrect Optional AI-evaluated correctness for subjective short answers.
+     * @param isRiskFree If true, Elo delta is strictly 0 and rating is unaffected.
+     * @param isShowAnswerPenalty If true, applies 1.1x standard incorrect penalty for revealing the answer.
      * @return Pair of (isCorrect: Boolean, calculationResult: EloCalculationResult)
      */
     suspend fun submitAnswer(
         question: PracticeQuestion,
         submittedAnswer: String,
-        isSemanticCorrect: Boolean? = null
+        isSemanticCorrect: Boolean? = null,
+        isRiskFree: Boolean = false,
+        isShowAnswerPenalty: Boolean = false
     ): Pair<Boolean, EloCalculationResult>
 
     /**

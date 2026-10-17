@@ -63,7 +63,11 @@ class DashboardFragment : Fragment() {
         }
 
         binding.btnOpenTheory.setOnClickListener {
-            findNavController().navigate(R.id.nav_theory)
+            val navOptions = androidx.navigation.NavOptions.Builder()
+                .setLaunchSingleTop(true)
+                .setPopUpTo(R.id.nav_dashboard, inclusive = false)
+                .build()
+            findNavController().navigate(R.id.nav_theory, null, navOptions)
         }
 
         binding.cardCombinatorics.setOnClickListener { openPracticeConfig(MathTopic.COMBINATORICS) }
@@ -78,7 +82,11 @@ class DashboardFragment : Fragment() {
                 PracticeFragment.EXTRA_CONFIG to config,
                 "category" to config.topicDisplayName
             )
-            findNavController().navigate(R.id.nav_practice, bundle)
+            val navOptions = androidx.navigation.NavOptions.Builder()
+                .setLaunchSingleTop(true)
+                .setPopUpTo(R.id.nav_dashboard, inclusive = false)
+                .build()
+            findNavController().navigate(R.id.nav_practice, bundle, navOptions)
         }
         sheet.show(childFragmentManager, PracticeConfigBottomSheet.TAG)
     }

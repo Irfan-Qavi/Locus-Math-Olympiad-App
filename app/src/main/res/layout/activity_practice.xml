@@ -54,6 +54,18 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEndPractice"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="6dp"
+                android:text="End Practice"
+                android:textColor="@color/error"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/tvEloBadge"
                 android:layout_width="wrap_content"
@@ -339,21 +351,110 @@
                     android:textSize="15sp"
                     android:textStyle="bold"
                     app:cornerRadius="8dp" />
+
+                <!-- Show Answer CTA Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnShowAnswer"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="6dp"
+                    android:text="Show Answer (Surrender Elo)"
+                    android:textColor="@color/outline"
+                    android:textSize="13sp" />
             </LinearLayout>
 
-            <!-- Subjective Type B (Prove That): "I HAVE SOLVED IT" Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSolveProof"
+            <!-- Revealed Answer Card (Shown when Show Answer is clicked) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardRevealedAnswer"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="12dp"
-                android:backgroundTint="@color/primary_container"
-                android:text="I HAVE SOLVED IT"
-                android:textColor="@color/on_primary_container"
-                android:textSize="15sp"
-                android:textStyle="bold"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:visibility="gone"
-                app:cornerRadius="10dp" />
+                app:cardBackgroundColor="@color/surface_container"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="@color/outline_variant"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.08"
+                        android:text="OFFICIAL ANSWER"
+                        android:textColor="@color/primary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvRevealedAnswerValue"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="serif"
+                        android:textColor="@color/on_surface"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvRevealedPenaltyNote"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/error"
+                        android:textSize="12sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRevealedNext"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="@color/primary_container"
+                        android:text="Next Problem  →"
+                        android:textColor="@color/on_primary_container"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="10dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Subjective Type B (Prove That): Initial Choice Buttons -->
+            <LinearLayout
+                android:id="@+id/containerProofChoices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnProofSolved"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:backgroundTint="@color/primary_container"
+                    android:text="I HAVE SOLVED IT"
+                    android:textColor="@color/on_primary_container"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="10dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnProofUnsolved"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:text="I COULDN'T SOLVE IT"
+                    android:textColor="@color/secondary"
+                    android:textSize="14sp"
+                    app:cornerRadius="10dp"
+                    app:strokeColor="@color/outline_variant" />
+            </LinearLayout>
 
             <!-- Canonical Proof Solution Card (Revealed on click) -->
             <com.google.android.material.card.MaterialCardView
@@ -389,56 +490,17 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp" />
 
-                    <!-- Proof Self-Evaluation Section -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Compare your proof argument above and self-evaluate:"
-                        android:textColor="@color/on_surface"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Proof questions carry neutral rating (0 Elo delta)."
-                        android:textColor="@color/outline"
-                        android:textSize="11sp" />
-
-                    <LinearLayout
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnProofNext"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnProofValid"
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_marginEnd="6dp"
-                            android:layout_weight="1"
-                            android:backgroundTint="@color/primary_container"
-                            android:text="My Proof Was Valid"
-                            android:textColor="@color/on_primary_container"
-                            android:textSize="13sp"
-                            android:textStyle="bold"
-                            app:cornerRadius="8dp" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnProofIncomplete"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_marginStart="6dp"
-                            android:layout_weight="1"
-                            android:text="Review Key Steps"
-                            android:textColor="@color/secondary"
-                            android:textSize="13sp"
-                            app:cornerRadius="8dp"
-                            app:strokeColor="@color/outline_variant" />
-                    </LinearLayout>
+                        android:layout_height="52dp"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="@color/primary_container"
+                        android:text="Next Problem  →"
+                        android:textColor="@color/on_primary_container"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="10dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -591,11 +653,12 @@
                 android:orientation="vertical"
                 android:padding="28dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏆"
-                    android:textSize="48sp" />
+                <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:contentDescription="Session Complete"
+                    android:src="@drawable/ic_check_circle"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="wrap_content"

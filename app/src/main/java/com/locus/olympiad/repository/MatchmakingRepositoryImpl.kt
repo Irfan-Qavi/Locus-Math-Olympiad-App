@@ -61,10 +61,16 @@ class MatchmakingRepositoryImpl(
         question
     }
 
+    override suspend fun getQuestionById(questionId: Long): PracticeQuestion? = withContext(Dispatchers.IO) {
+        questionDao.getQuestionByIdSync(questionId)
+    }
+
     override suspend fun submitAnswer(
         question: PracticeQuestion,
         submittedAnswer: String,
-        isSemanticCorrect: Boolean?
+        isSemanticCorrect: Boolean?,
+        isRiskFree: Boolean,
+        isShowAnswerPenalty: Boolean
     ): Pair<Boolean, EloCalculationResult> = withContext(Dispatchers.IO) {
         val categoryName = question.category
 
@@ -109,18 +115,72 @@ class MatchmakingRepositoryImpl(
             )
         }
 
-        val isCorrect = if (question.resolvedType == com.locus.olympiad.data.model.QuestionType.SUBJECTIVE_SHORT && isSemanticCorrect != null) {
+        // Determine correctness
+        val isCorrect = if (isShowAnswerPenalty) {
+            false
+        } else if (question.resolvedType == com.locus.olympiad.data.model.QuestionType.SUBJECTIVE_SHORT && isSemanticCorrect != null) {
             isSemanticCorrect
         } else {
             isAnswerCorrect(question.correctAnswer, submittedAnswer)
         }
 
-        // Compute new Elo with standard logistic equation
-        val eloResult = EloCalculator.calculateNewRating(
-            userElo = currentElo,
-            questionDifficulty = question.difficultyElo,
-            isCorrect = isCorrect
-        )
+        // Risk-Free Practice Mode: Elo delta is strictly 0 and rating does not change
+        if (isRiskFree) {
+            val solvedIncrement = if (isCorrect) 1 else 0
+            if (currentProfile == null) {
+                profileDao.insertOrUpdateProfile(
+                    UserTopicProfile(
+                        category = categoryName,
+                        eloRating = currentElo,
+                        questionsSolved = solvedIncrement,
+                        questionsAttempted = 1
+                    )
+                )
+            } else {
+                profileDao.recordSubmissionResult(
+                    category = categoryName,
+                    newElo = currentElo,
+                    solvedIncrement = solvedIncrement
+                )
+            }
+
+            return@withContext Pair(
+                isCorrect,
+                EloCalculationResult(
+                    oldElo = currentElo,
+                    newElo = currentElo,
+                    delta = 0,
+                    expectedScore = EloCalculator.calculateExpectedScore(currentElo, question.difficultyElo),
+                    isCorrect = isCorrect,
+                    questionDifficulty = question.difficultyElo
+                )
+            )
+        }
+
+        // Compute new Elo with standard logistic equation or 1.1x surrender penalty
+        val eloResult = if (isShowAnswerPenalty) {
+            val standardPenaltyResult = EloCalculator.calculateNewRating(
+                userElo = currentElo,
+                questionDifficulty = question.difficultyElo,
+                isCorrect = false
+            )
+            val penalty = kotlin.math.round(standardPenaltyResult.delta * 1.1).toInt()
+            val newElo = maxOf(0, currentElo + penalty)
+            EloCalculationResult(
+                oldElo = currentElo,
+                newElo = newElo,
+                delta = penalty,
+                expectedScore = standardPenaltyResult.expectedScore,
+                isCorrect = false,
+                questionDifficulty = question.difficultyElo
+            )
+        } else {
+            EloCalculator.calculateNewRating(
+                userElo = currentElo,
+                questionDifficulty = question.difficultyElo,
+                isCorrect = isCorrect
+            )
+        }
 
         // Persist the updated rating atomically
         val solvedIncrement = if (isCorrect) 1 else 0

@@ -13,7 +13,8 @@ import java.io.Serializable
 data class PracticeSessionConfig(
     val topic: MathTopic? = null,
     val difficultyTier: String = "Adaptive",
-    val questionCount: Int = 0
+    val questionCount: Int = 0,
+    val isRiskFree: Boolean = false
 ) : Serializable {
 
     val isEndless: Boolean
@@ -25,6 +26,7 @@ data class PracticeSessionConfig(
     val displaySummary: String
         get() {
             val countStr = if (isEndless) "Endless" else "$questionCount Problems"
-            return "$topicDisplayName • $difficultyTier • $countStr"
+            val riskStr = if (isRiskFree) " • Risk-Free" else ""
+            return "$topicDisplayName • $difficultyTier • $countStr$riskStr"
         }
 }
