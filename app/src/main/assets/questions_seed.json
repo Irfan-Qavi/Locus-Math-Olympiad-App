@@ -1,200 +1,130 @@
 [
-  {
-    "category": "Combinatorics",
-    "difficulty_elo": 1000,
-    "question_type": "OBJECTIVE",
-    "latex_content": "Let $G = (V, E)$ be a connected simple graph with $n \\ge 4$ vertices. Suppose for every partition $V = A \\cup B$ of the vertex set into non-empty disjoint subsets, the number of crossing edges satisfies:\n$$e(A, B) \\ge \\left\\lceil \\frac{|A| \\cdot |B|}{n - 1} \\right\\rceil + \\sum_{v \\in A} \\operatorname{deg}(v) \\pmod 2$$\nDetermine the minimum possible chromatic number $\\chi(G)$ across all such graphs.",
-    "correct_answer": "3",
-    "list_of_hints": [
-      "Consider the parity of the degree sum over $A$ and examine the case where $G$ contains an Eulerian sub-graph.",
-      "If $\\chi(G) = 2$, then $G$ is bipartite. Partition $V$ into the two color classes and check whether the parity constraint can hold for all cuts.",
-      "Notice that an odd cycle requires at least 3 colors. Test if $\\chi(G)=3$ satisfies the lower bound by constructing an admissible 3-chromatic triangulation."
-    ],
-    "source": "International Olympiad Training • Tier III",
-    "tier": "Tier III"
-  },
-  {
-    "category": "Combinatorics",
-    "difficulty_elo": 1080,
-    "question_type": "OBJECTIVE",
-    "latex_content": "Find the number of permutations $\\pi$ of $\\{1, 2, \\dots, 6\\}$ such that for all $1 \\le k \\le 5$:\n$$|\\pi(k) - \\pi(k+1)| \\ne 1$$",
-    "correct_answer": "90",
-    "list_of_hints": [
-      "Use the Principle of Inclusion-Exclusion (PIE) on the conditions that adjacent elements are consecutive.",
-      "Let $A_i$ be the property that $|\\pi(i) - \\pi(i+1)| = 1$. Count the intersections by grouping adjacent pairs into blocks.",
-      "Evaluate $\\sum_{k=0}^5 (-1)^k N(k)$ using the number of ways to place $k$ disjoint domino tiles."
-    ],
-    "source": "IOQM Final Stage",
-    "tier": "Tier II"
-  },
-  {
-    "category": "Combinatorics",
-    "difficulty_elo": 1150,
-    "question_type": "SUBJECTIVE_SHORT",
-    "latex_content": "A standard $8 \\times 8$ chessboard has two opposite corner squares removed. How many dominoes of size $1 \\times 2$ are required to cover the remaining 62 squares? (Enter the count or phrase if impossible).",
-    "correct_answer": "Impossible",
-    "list_of_hints": [
-      "Color the chessboard alternately with black and white squares in standard fashion.",
-      "Count the number of black squares and white squares after removing opposite corners.",
-      "Each $1 \\times 2$ domino must cover exactly one black square and one white square."
-    ],
-    "source": "IOQM National Level",
-    "tier": "Tier II"
-  },
-  {
-    "category": "Combinatorics",
-    "difficulty_elo": 1210,
-    "question_type": "OBJECTIVE",
-    "latex_content": "In how many ways can 10 identical math olympiad medals be distributed among 4 distinct students such that each student receives at least one medal?",
-    "correct_answer": "84",
-    "list_of_hints": [
-      "Apply the Stars and Bars theorem (balls and urns representation).",
-      "Give 1 medal to each of the 4 students first, leaving $10 - 4 = 6$ medals to distribute freely.",
-      "Calculate $\\binom{6 + 4 - 1}{4 - 1} = \\binom{9}{3} = \\frac{9 \\times 8 \\times 7}{6} = 84$."
-    ],
-    "source": "RMO Combinatorics Prelims",
-    "tier": "Tier I"
-  },
-  {
-    "category": "Algebra",
-    "difficulty_elo": 1020,
-    "question_type": "OBJECTIVE",
-    "latex_content": "Find all real solutions $(x, y)$ to the symmetric system of equations:\n$$\\begin{cases} x^3 - y^3 = 7 \\\\ x^2 y - x y^2 = 2 \\end{cases}$$\nWhat is the maximum value of $x + y$?",
-    "correct_answer": "3",
-    "list_of_hints": [
-      "Notice that $x^3 - 3x^2y + 3xy^2 - y^3 = (x - y)^3$.",
-      "Compute $(x - y)^3 = (x^3 - y^3) - 3(x^2y - xy^2) = 7 - 3(2) = 1$. Thus $x - y = 1$.",
-      "Substitute $x = y + 1$ into $xy(x - y) = 2$ to find $y(y + 1) = 2$, giving roots $y = 1$ or $y = -2$."
-    ],
-    "source": "RMO Algebra Round",
-    "tier": "Tier II"
-  },
-  {
-    "category": "Algebra",
-    "difficulty_elo": 1140,
-    "question_type": "SUBJECTIVE_SHORT",
-    "latex_content": "Let $P(x)$ be a polynomial with integer coefficients such that $P(1) = 2024$ and $P(2024) = 1$.\nIf $P(k) = k$ for some integer $k$, find the value of $k$. (Answer 'No solution' if none exists).",
-    "correct_answer": "No solution",
-    "list_of_hints": [
-      "Recall the fundamental integer polynomial divisibility property: $(a - b) \\mid (P(a) - P(b))$ for distinct integers $a, b$.",
-      "Apply this property to pairs $(k, 1)$ and $(k, 2024)$.",
-      "Analyze whether $(k - 1) \\mid (k - 2024)$ and $(k - 2024) \\mid (k - 1)$ can both hold simultaneously."
-    ],
-    "source": "IOQM National Camp",
-    "tier": "Tier III"
-  },
-  {
-    "category": "Algebra",
-    "difficulty_elo": 980,
-    "question_type": "OBJECTIVE",
-    "latex_content": "If real numbers $a, b, c > 0$ satisfy $a + b + c = 6$, find the maximum value of:\n$$\\sqrt{4a + 1} + \\sqrt{4b + 1} + \\sqrt{4c + 1}$$",
-    "correct_answer": "9",
-    "list_of_hints": [
-      "Consider using the Cauchy-Schwarz inequality or Jensen's inequality.",
-      "The function $f(t) = \\sqrt{4t + 1}$ is strictly concave on $(0, \\infty)$ since $f''(t) < 0$.",
-      "By Jensen's inequality, $f(a) + f(b) + f(c) \\le 3 f\\left(\\frac{a+b+c}{3}\\right) = 3 f(2) = 3 \\sqrt{9} = 9$."
-    ],
-    "source": "IOQM Algebra Prelims",
-    "tier": "Tier I"
-  },
-  {
-    "category": "Algebra",
-    "difficulty_elo": 1450,
-    "question_type": "SUBJECTIVE_PROOF",
-    "latex_content": "Prove that for all positive real numbers $a, b, c$:\n$$\\frac{a}{b + c} + \\frac{b}{c + a} + \\frac{c}{a + b} \\ge \\frac{3}{2}$$",
-    "correct_answer": "Nesbitt Inequality holds by Cauchy-Schwarz",
-    "proof_solution": "By Cauchy-Schwarz in Engel form (Sedrakyan lemma):\n$$\\sum_{cyc} \\frac{a}{b+c} = \\sum_{cyc} \\frac{a^2}{ab + ac} \\ge \\frac{(a+b+c)^2}{2(ab+bc+ca)}$$\nSince $(a+b+c)^2 = a^2+b^2+c^2 + 2(ab+bc+ca) \\ge 3(ab+bc+ca)$, we have:\n$$\\frac{(a+b+c)^2}{2(ab+bc+ca)} \\ge \\frac{3(ab+bc+ca)}{2(ab+bc+ca)} = \\frac{3}{2}$$\nEquality holds if and only if $a = b = c$. $\\blacksquare$",
-    "list_of_hints": [
-      "Consider rewriting each term by adding 1: $\\frac{a}{b+c} + 1 = \\frac{a+b+c}{b+c}$.",
-      "Apply Cauchy-Schwarz inequality or AM-HM inequality to $\\sum \\frac{1}{b+c}$.",
-      "Alternatively, apply Sedrakyan's lemma (Cauchy-Schwarz in Engel form)."
-    ],
-    "source": "Nesbitt's Classical Lemma • Tier II",
-    "tier": "Tier II"
-  },
-  {
-    "category": "Number Theory",
-    "difficulty_elo": 990,
-    "question_type": "OBJECTIVE",
-    "latex_content": "Find the remainder when $2^{2026} + 3^{2026}$ is divided by $13$.",
-    "correct_answer": "0",
-    "list_of_hints": [
-      "Apply Fermat's Little Theorem: for prime $p=13$ and $\\gcd(a, 13) = 1$, $a^{12} \\equiv 1 \\pmod{13}$.",
-      "Reduce the exponent $2026$ modulo $12$: $2026 = 12 \\times 168 + 10$.",
-      "Calculate $2^{10} \\pmod{13}$ and $3^{10} \\pmod{13}$ and sum them up modulo 13."
-    ],
-    "source": "IOQM Prelims",
-    "tier": "Tier I"
-  },
-  {
-    "category": "Number Theory",
-    "difficulty_elo": 1050,
-    "question_type": "OBJECTIVE",
-    "latex_content": "Find all pairs of primes $(p, q)$ such that:\n$$p^2 - 2q^2 = 1$$\nWhat is the sum $p + q$?",
-    "correct_answer": "5",
-    "list_of_hints": [
-      "Rewrite the equation as $p^2 - 1 = 2q^2$, which factors as $(p - 1)(p + 1) = 2q^2$.",
-      "Consider the parity of $p$. If $p=2$, $4 - 2q^2 = 1$ has no prime solution. Thus $p$ must be odd.",
-      "Since $p$ is odd, both $p - 1$ and $p + 1$ are consecutive even integers. Deduce $q = 2$ and $p = 3$."
-    ],
-    "source": "RMO Number Theory",
-    "tier": "Tier II"
-  },
-  {
-    "category": "Number Theory",
-    "difficulty_elo": 1180,
-    "question_type": "OBJECTIVE",
-    "latex_content": "Determine the highest power of 2 that divides the product:\n$$\\prod_{k=1}^{50} (2k - 1) \\cdot \\prod_{k=1}^{50} (2k)$$",
-    "correct_answer": "97",
-    "list_of_hints": [
-      "Notice that the given product is simply $100!$.",
-      "Apply Legendre's formula for the $p$-adic valuation $v_p(n!) = \\sum_{j=1}^{\\infty} \\left\\lfloor \\frac{n}{p^j} \\right\\rfloor$.",
-      "Compute $\\lfloor 100/2 \\rfloor + \\lfloor 100/4 \\rfloor + \\lfloor 100/8 \\rfloor + \\lfloor 100/16 \\rfloor + \\lfloor 100/32 \\rfloor + \\lfloor 100/64 \\rfloor$."
-    ],
-    "source": "IOQM Number Theory Stage",
-    "tier": "Tier II"
-  },
-  {
-    "category": "Geometry",
-    "difficulty_elo": 1010,
-    "question_type": "OBJECTIVE",
-    "latex_content": "In acute triangle $\\triangle ABC$, let $H$ be the orthocenter and $O$ the circumcenter. If $\\angle A = 60^\\circ$ and $BC = 12$, compute the length of the segment $OH$.",
-    "correct_answer": "12",
-    "list_of_hints": [
-      "Recall Euler's triangle formula or the relation between $AH$ and circumradius $R$: $AH = 2R \\cos A$.",
-      "For $\\angle A = 60^\\circ$, $\\cos 60^\\circ = 1/2$, so $AH = R$.",
-      "Notice that in quadrilateral $AHCO$ or by the distance formula $OH^2 = 9R^2 - (a^2+b^2+c^2)$, what is $R$ when $a=12$ and $\\angle A=60^\\circ$? $a = 2R \\sin 60^\\circ$, giving $R = 4\\sqrt{3}$, hence $OH = 12$."
-    ],
-    "source": "RMO Geometry",
-    "tier": "Tier II"
-  },
-  {
-    "category": "Geometry",
-    "difficulty_elo": 1500,
-    "question_type": "SUBJECTIVE_PROOF",
-    "latex_content": "Let $\\triangle ABC$ be an acute triangle with circumcenter $O$ and orthocenter $H$. Prove that the vector sum satisfies:\n$$\\vec{OH} = \\vec{OA} + \\vec{OB} + \\vec{OC}$$",
-    "correct_answer": "Euler vector relation holds by altitude projections",
-    "proof_solution": "Choose circumcenter $O$ as the origin. Define point $H'$ by $\\vec{OH'} = \\vec{OA} + \\vec{OB} + \\vec{OC}$.\nThen $\\vec{AH'} = \\vec{OH'} - \\vec{OA} = \\vec{OB} + \\vec{OC} = 2\\vec{OM_a}$, where $M_a$ is the midpoint of $BC$.\nSince $O$ is the circumcenter, $OM_a \\perp BC$, which implies $AH' \\perp BC$.\nBy cyclical symmetry, $BH' \\perp CA$ and $CH' \\perp AB$.\nSince the altitudes of $\\triangle ABC$ concur at a unique point (the orthocenter $H$), $H' = H$.\nThus $\\vec{OH} = \\vec{OA} + \\vec{OB} + \\vec{OC}$. $\\blacksquare$",
-    "list_of_hints": [
-      "Let circumcenter $O$ be the origin of coordinates.",
-      "Consider the auxiliary point $H'$ defined by $\\vec{OH'} = \\vec{OA} + \\vec{OB} + \\vec{OC}$.",
-      "Examine the vector difference $\\vec{AH'} = \\vec{OH'} - \\vec{OA}$ and relate it to the perpendicular bisector from $O$ to $BC$."
-    ],
-    "source": "Euler's Classical Vector Theorem",
-    "tier": "Tier III"
-  },
-  {
-    "category": "Geometry",
-    "difficulty_elo": 960,
-    "question_type": "OBJECTIVE",
-    "latex_content": "Two parallel chords of a circle with radius 10 have lengths 12 and 16. If both chords lie on the same side of the circle's center, find the distance between the two chords.",
-    "correct_answer": "2",
-    "list_of_hints": [
-      "Draw the perpendicular from the center to each chord, which bisects the chord.",
-      "The half-lengths of the chords are $12/2 = 6$ and $16/2 = 8$.",
-      "By the Pythagorean theorem, the distances from the center are $\\sqrt{10^2 - 6^2} = 8$ and $\\sqrt{10^2 - 8^2} = 6$. Compute $8 - 6 = 2$."
-    ],
-    "source": "IOQM Geometry Prelims",
-    "tier": "Tier I"
-  }
+    {
+        "category":  "Combinatorics",
+        "difficulty_elo":  1000,
+        "question_type":  "OBJECTIVE",
+        "latex_content":  "Let $G = (V, E)$ be a connected simple graph with $n \\ge 4$ vertices. Suppose for every partition $V = A \\cup B$ of the vertex set into non-empty disjoint subsets, the number of crossing edges satisfies:\n$$e(A, B) \\ge \\left\\lceil \\frac{|A| \\cdot |B|}{n - 1} \\right\\rceil + \\sum_{v \\in A} \\operatorname{deg}(v) \\pmod 2$$\nDetermine the minimum possible chromatic number $\\chi(G)$ across all such graphs.",
+        "correct_answer":  "3",
+        "source":  "International Olympiad Training â€¢ Tier III",
+        "tier":  "Tier III"
+    },
+    {
+        "category":  "Combinatorics",
+        "difficulty_elo":  1080,
+        "question_type":  "OBJECTIVE",
+        "latex_content":  "Find the number of permutations $\\pi$ of $\\{1, 2, \\dots, 6\\}$ such that for all $1 \\le k \\le 5$:\n$$|\\pi(k) - \\pi(k+1)| \\ne 1$$",
+        "correct_answer":  "90",
+        "source":  "IOQM Final Stage",
+        "tier":  "Tier II"
+    },
+    {
+        "category":  "Combinatorics",
+        "difficulty_elo":  1150,
+        "question_type":  "SUBJECTIVE_SHORT",
+        "latex_content":  "A standard $8 \\times 8$ chessboard has two opposite corner squares removed. How many dominoes of size $1 \\times 2$ are required to cover the remaining 62 squares? (Enter the count or phrase if impossible).",
+        "correct_answer":  "Impossible",
+        "source":  "IOQM National Level",
+        "tier":  "Tier II"
+    },
+    {
+        "category":  "Combinatorics",
+        "difficulty_elo":  1210,
+        "question_type":  "OBJECTIVE",
+        "latex_content":  "In how many ways can 10 identical math olympiad medals be distributed among 4 distinct students such that each student receives at least one medal?",
+        "correct_answer":  "84",
+        "source":  "RMO Combinatorics Prelims",
+        "tier":  "Tier I"
+    },
+    {
+        "category":  "Algebra",
+        "difficulty_elo":  1020,
+        "question_type":  "OBJECTIVE",
+        "latex_content":  "Find all real solutions $(x, y)$ to the symmetric system of equations:\n$$\\begin{cases} x^3 - y^3 = 7 \\\\ x^2 y - x y^2 = 2 \\end{cases}$$\nWhat is the maximum value of $x + y$?",
+        "correct_answer":  "3",
+        "source":  "RMO Algebra Round",
+        "tier":  "Tier II"
+    },
+    {
+        "category":  "Algebra",
+        "difficulty_elo":  1140,
+        "question_type":  "SUBJECTIVE_SHORT",
+        "latex_content":  "Let $P(x)$ be a polynomial with integer coefficients such that $P(1) = 2024$ and $P(2024) = 1$.\nIf $P(k) = k$ for some integer $k$, find the value of $k$. (Answer \u0027No solution\u0027 if none exists).",
+        "correct_answer":  "No solution",
+        "source":  "IOQM National Camp",
+        "tier":  "Tier III"
+    },
+    {
+        "category":  "Algebra",
+        "difficulty_elo":  980,
+        "question_type":  "OBJECTIVE",
+        "latex_content":  "If real numbers $a, b, c \u003e 0$ satisfy $a + b + c = 6$, find the maximum value of:\n$$\\sqrt{4a + 1} + \\sqrt{4b + 1} + \\sqrt{4c + 1}$$",
+        "correct_answer":  "9",
+        "source":  "IOQM Algebra Prelims",
+        "tier":  "Tier I"
+    },
+    {
+        "category":  "Algebra",
+        "difficulty_elo":  1450,
+        "question_type":  "SUBJECTIVE_PROOF",
+        "latex_content":  "Prove that for all positive real numbers $a, b, c$:\n$$\\frac{a}{b + c} + \\frac{b}{c + a} + \\frac{c}{a + b} \\ge \\frac{3}{2}$$",
+        "correct_answer":  "Nesbitt Inequality holds by Cauchy-Schwarz",
+        "proof_solution":  "By Cauchy-Schwarz in Engel form (Sedrakyan lemma):\n$$\\sum_{cyc} \\frac{a}{b+c} = \\sum_{cyc} \\frac{a^2}{ab + ac} \\ge \\frac{(a+b+c)^2}{2(ab+bc+ca)}$$\nSince $(a+b+c)^2 = a^2+b^2+c^2 + 2(ab+bc+ca) \\ge 3(ab+bc+ca)$, we have:\n$$\\frac{(a+b+c)^2}{2(ab+bc+ca)} \\ge \\frac{3(ab+bc+ca)}{2(ab+bc+ca)} = \\frac{3}{2}$$\nEquality holds if and only if $a = b = c$. $\\blacksquare$",
+        "source":  "Nesbitt\u0027s Classical Lemma â€¢ Tier II",
+        "tier":  "Tier II"
+    },
+    {
+        "category":  "Number Theory",
+        "difficulty_elo":  990,
+        "question_type":  "OBJECTIVE",
+        "latex_content":  "Find the remainder when $2^{2026} + 3^{2026}$ is divided by $13$.",
+        "correct_answer":  "0",
+        "source":  "IOQM Prelims",
+        "tier":  "Tier I"
+    },
+    {
+        "category":  "Number Theory",
+        "difficulty_elo":  1050,
+        "question_type":  "OBJECTIVE",
+        "latex_content":  "Find all pairs of primes $(p, q)$ such that:\n$$p^2 - 2q^2 = 1$$\nWhat is the sum $p + q$?",
+        "correct_answer":  "5",
+        "source":  "RMO Number Theory",
+        "tier":  "Tier II"
+    },
+    {
+        "category":  "Number Theory",
+        "difficulty_elo":  1180,
+        "question_type":  "OBJECTIVE",
+        "latex_content":  "Determine the highest power of 2 that divides the product:\n$$\\prod_{k=1}^{50} (2k - 1) \\cdot \\prod_{k=1}^{50} (2k)$$",
+        "correct_answer":  "97",
+        "source":  "IOQM Number Theory Stage",
+        "tier":  "Tier II"
+    },
+    {
+        "category":  "Geometry",
+        "difficulty_elo":  1010,
+        "question_type":  "OBJECTIVE",
+        "latex_content":  "In acute triangle $\\triangle ABC$, let $H$ be the orthocenter and $O$ the circumcenter. If $\\angle A = 60^\\circ$ and $BC = 12$, compute the length of the segment $OH$.",
+        "correct_answer":  "12",
+        "source":  "RMO Geometry",
+        "tier":  "Tier II"
+    },
+    {
+        "category":  "Geometry",
+        "difficulty_elo":  1500,
+        "question_type":  "SUBJECTIVE_PROOF",
+        "latex_content":  "Let $\\triangle ABC$ be an acute triangle with circumcenter $O$ and orthocenter $H$. Prove that the vector sum satisfies:\n$$\\vec{OH} = \\vec{OA} + \\vec{OB} + \\vec{OC}$$",
+        "correct_answer":  "Euler vector relation holds by altitude projections",
+        "proof_solution":  "Choose circumcenter $O$ as the origin. Define point $H\u0027$ by $\\vec{OH\u0027} = \\vec{OA} + \\vec{OB} + \\vec{OC}$.\nThen $\\vec{AH\u0027} = \\vec{OH\u0027} - \\vec{OA} = \\vec{OB} + \\vec{OC} = 2\\vec{OM_a}$, where $M_a$ is the midpoint of $BC$.\nSince $O$ is the circumcenter, $OM_a \\perp BC$, which implies $AH\u0027 \\perp BC$.\nBy cyclical symmetry, $BH\u0027 \\perp CA$ and $CH\u0027 \\perp AB$.\nSince the altitudes of $\\triangle ABC$ concur at a unique point (the orthocenter $H$), $H\u0027 = H$.\nThus $\\vec{OH} = \\vec{OA} + \\vec{OB} + \\vec{OC}$. $\\blacksquare$",
+        "source":  "Euler\u0027s Classical Vector Theorem",
+        "tier":  "Tier III"
+    },
+    {
+        "category":  "Geometry",
+        "difficulty_elo":  960,
+        "question_type":  "OBJECTIVE",
+        "latex_content":  "Two parallel chords of a circle with radius 10 have lengths 12 and 16. If both chords lie on the same side of the circle\u0027s center, find the distance between the two chords.",
+        "correct_answer":  "2",
+        "source":  "IOQM Geometry Prelims",
+        "tier":  "Tier I"
+    }
 ]

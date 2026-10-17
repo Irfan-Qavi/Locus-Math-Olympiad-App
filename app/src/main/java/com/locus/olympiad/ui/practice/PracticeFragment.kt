@@ -67,10 +67,6 @@ class PracticeFragment : Fragment() {
             navigateBack()
         }
 
-        binding.btnRevealHint.setOnClickListener {
-            viewModel.revealNextHint()
-        }
-
         binding.btnSubmitAnswer.setOnClickListener {
             val answer = binding.etAnswer.text?.toString().orEmpty()
             viewModel.submitAnswer(answer)
@@ -209,41 +205,10 @@ class PracticeFragment : Fragment() {
             }
         }
 
-        // Progressive Hints Rendering
-        binding.containerRevealedHints.removeAllViews()
-        state.visibleHints.forEachIndexed { index, hintText ->
-            val hintView = LayoutInflater.from(requireContext()).inflate(
-                R.layout.item_revealed_hint,
-                binding.containerRevealedHints,
-                false
-            )
-            hintView.findViewById<TextView>(R.id.tvHintTitle).text = "Hint ${index + 1} • Conceptual Lemma"
-            hintView.findViewById<TextView>(R.id.tvHintContent).text = hintText
-            binding.containerRevealedHints.addView(hintView)
-        }
-
-        // Reveal Hint Button State
-        if (state.hasMoreHints) {
-            val nextHintNum = state.revealedHintsCount + 1
-            binding.btnRevealHint.isVisible = true
-            binding.btnRevealHint.text = "Reveal Hint $nextHintNum (${state.totalHintsCount - state.revealedHintsCount} remaining)"
-        } else {
-            binding.btnRevealHint.isVisible = false
-        }
-
         // Draft Answer synchronization
         if (binding.etAnswer.text.toString() != state.userDraftAnswer) {
             binding.etAnswer.setText(state.userDraftAnswer)
             binding.etAnswer.setSelection(state.userDraftAnswer.length)
-        }
-
-        // AI Tutor Diagnostic Stepping Stone (Hard-Stuck Trigger)
-        if (state.isHardStuck || state.aiTutorHint != null) {
-            binding.cardAiTutorHint.isVisible = true
-            binding.progressAiTutor.isVisible = state.isLoadingAiHint
-            binding.tvAiTutorHint.text = state.aiTutorHint ?: "Locus AI Tutor is diagnosing your 3 incorrect attempts..."
-        } else {
-            binding.cardAiTutorHint.isVisible = false
         }
 
         // Prominent Centered Evaluation Feedback Overlay

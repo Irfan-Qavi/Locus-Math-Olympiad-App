@@ -1,11 +1,11 @@
 package com.locus.olympiad.viewmodel
 
 import com.locus.olympiad.data.model.PracticeQuestion
+import com.locus.olympiad.data.model.PracticeSessionConfig
 import com.locus.olympiad.domain.ai.AiTutorRepository
 import com.locus.olympiad.domain.elo.EloCalculationResult
 import com.locus.olympiad.repository.MatchmakingRepository
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,8 +33,7 @@ class PracticeViewModelTest {
         category = "Combinatorics",
         difficultyElo = 1000,
         latexContent = "Calculate $\\chi(G)$",
-        correctAnswer = "3",
-        listOfHints = listOf("Hint 1", "Hint 2", "Hint 3")
+        correctAnswer = "3"
     )
 
     @Before
@@ -48,69 +47,66 @@ class PracticeViewModelTest {
     }
 
     @Test
-    fun testRevealNextHint_IncrementsCountAndExposesHints() {
+    fun testStartSession_InitializesSessionStateAndLoadsQuestion() = runTest {
+        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any()) } returns testQuestion
+
         val viewModel = PracticeViewModel(matchmakingRepository, aiTutorRepository)
-        // Inject question into state
-        viewModel.updateDraftAnswer("test")
+        val config = PracticeSessionConfig(questionCount = 5, difficultyTier = "Intermediate")
+        viewModel.startSession(config)
+        advanceUntilIdle()
 
-        // Initial count is 0
-        assertEquals(0, viewModel.uiState.value.revealedHintsCount)
-
-        // Reveal hint 1
-        // We can simulate having a loaded question
-        coEvery { matchmakingRepository.getNextPracticeQuestion(any()) } returns testQuestion
-        viewModel.loadNextQuestion(testQuestion.topic)
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        assertEquals(0, viewModel.uiState.value.revealedHintsCount)
-        assertEquals(0, viewModel.uiState.value.visibleHints.size)
-
-        viewModel.revealNextHint()
-        assertEquals(1, viewModel.uiState.value.revealedHintsCount)
-        assertEquals(listOf("Hint 1"), viewModel.uiState.value.visibleHints)
-
-        viewModel.revealNextHint()
-        assertEquals(2, viewModel.uiState.value.revealedHintsCount)
-        assertEquals(listOf("Hint 1", "Hint 2"), viewModel.uiState.value.visibleHints)
+        assertEquals(1, viewModel.uiState.value.sessionQuestionIndex)
+        assertEquals(0, viewModel.uiState.value.sessionSolvedCount)
+        assertEquals(testQuestion, viewModel.uiState.value.currentQuestion)
     }
 
     @Test
-    fun testHardStuckTrigger_FiresAiTutorAfter3IncorrectAttempts() = runTest {
-        coEvery { matchmakingRepository.getNextPracticeQuestion(any()) } returns testQuestion
-        coEvery { matchmakingRepository.submitAnswer(testQuestion, any()) } returns Pair(
-            false,
-            EloCalculationResult(1000, 984, -16, 0.5, false, 1000)
-        )
-        coEvery { aiTutorRepository.getConceptualHint(any(), any(), any()) } returns Result.success(
-            "Consider the parity of the degree sum over \$A."
+    fun testSubmitAnswer_CorrectAnswerUpdatesEloAndSolvedCount() = runTest {
+        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any()) } returns testQuestion
+        coEvery { matchmakingRepository.submitAnswer(testQuestion, "3", any()) } returns Pair(
+            true,
+            EloCalculationResult(1000, 1016, 16, 0.5, true, 1000)
         )
 
         val viewModel = PracticeViewModel(matchmakingRepository, aiTutorRepository)
         viewModel.loadNextQuestion(testQuestion.topic)
         advanceUntilIdle()
 
-        // Attempt 1: incorrect
-        viewModel.submitAnswer("1")
+        viewModel.submitAnswer("3")
         advanceUntilIdle()
-        assertFalse(viewModel.uiState.value.isHardStuck)
-        assertEquals(listOf("1"), viewModel.uiState.value.incorrectAttempts)
 
-        // Attempt 2: incorrect
-        viewModel.submitAnswer("2")
+        assertTrue(viewModel.uiState.value.lastSubmissionCorrect == true)
+        assertEquals(1016, viewModel.uiState.value.userElo)
+        assertEquals(1, viewModel.uiState.value.sessionSolvedCount)
+        assertEquals(16, viewModel.uiState.value.sessionNetEloDelta)
+    }
+
+    @Test
+    fun testSubmitProofSelfEvaluation_UpdatesRatingAndSessionStatus() = runTest {
+        val proofQuestion = PracticeQuestion(
+            id = 2,
+            category = "Algebra",
+            difficultyElo = 1450,
+            questionType = "SUBJECTIVE_PROOF",
+            latexContent = "Prove Nesbitt Inequality",
+            correctAnswer = "Nesbitt Inequality holds",
+            proofSolution = "By Cauchy-Schwarz in Engel form..."
+        )
+        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any()) } returns proofQuestion
+        coEvery { matchmakingRepository.submitAnswer(proofQuestion, "PROVED", any()) } returns Pair(
+            true,
+            EloCalculationResult(1000, 1000, 0, 0.5, true, 1450)
+        )
+
+        val viewModel = PracticeViewModel(matchmakingRepository, aiTutorRepository)
+        viewModel.loadNextQuestion(proofQuestion.topic)
         advanceUntilIdle()
-        assertFalse(viewModel.uiState.value.isHardStuck)
-        assertEquals(listOf("1", "2"), viewModel.uiState.value.incorrectAttempts)
 
-        // Attempt 3: incorrect -> triggers hard stuck and AI tutor call
-        viewModel.submitAnswer("4")
+        viewModel.submitProofSelfEvaluation(true)
         advanceUntilIdle()
-        assertTrue(viewModel.uiState.value.isHardStuck)
-        assertEquals(listOf("1", "2", "4"), viewModel.uiState.value.incorrectAttempts)
-        assertEquals("Consider the parity of the degree sum over \$A.", viewModel.uiState.value.aiTutorHint)
 
-        // Verify AI Tutor repository was called
-        coVerify(exactly = 1) {
-            aiTutorRepository.getConceptualHint(testQuestion, 984, listOf("1", "2", "4"))
-        }
+        assertTrue(viewModel.uiState.value.lastSubmissionCorrect == true)
+        assertEquals(1, viewModel.uiState.value.sessionSolvedCount)
+        assertEquals(0, viewModel.uiState.value.sessionNetEloDelta)
     }
 }

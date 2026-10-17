@@ -1,13 +1,13 @@
 # Locus — Olympiad Mathematics Preparation App
 
 <p align="center">
-  <b>Master Olympiad Mathematics with Adaptive Elo Matchmaking and Socratic AI Tutoring</b><br>
+  <b>Master Olympiad Mathematics with Adaptive Elo Matchmaking and Socratic AI Evaluation</b><br>
   <i>Tailored for IOQM, RMO, INMO, and International Mathematical Olympiad (IMO) aspirants</i>
 </p>
 
 ## Overview
 
-**Locus** (Euler IMO) is a native Android application designed to train competitive mathematics olympiad students through adaptive problem matchmaking, publication-grade LaTeX mathematical rendering, progressive pedagogical hints, and a diagnostic Socratic AI tutor.
+**Locus** is a native Android application designed to train competitive mathematics olympiad students through adaptive problem matchmaking, fully offline publication-grade LaTeX mathematical rendering, academic theory monographs, and an AI-powered evaluation engine for subjective solutions.
 
 Built using **Modern Android Architecture (MVVM + Clean Architecture)**, the application leverages an OLED dark-mode design system derived from Google Stitch UI, strict separation of concerns, Dagger-Hilt dependency injection, and Room SQLite persistence.
 
@@ -21,29 +21,27 @@ Built using **Modern Android Architecture (MVVM + Clean Architecture)**, the app
   - **Geometry** (Projective Geometry, Incircle/Circumcircle, Cyclic Quadrilaterals)
 - **Dynamic Logistic Curve**: Uses standard FIDE/logistic rating updates with adaptive K-factors based on student experience.
 - **Matchmaking Window**: Matches problems within a $\pm 150$ Elo window of the user's current rating, with nearest-neighbor fallback.
+- **Configurable Practice Sessions**: Allows students to configure target topic, difficulty tiers (Foundational, Intermediate, Olympiad), and problem counts (5, 10, 15, or Endless mode) without distraction from artificial timers.
 
-### 2. Academic KaTeX Mathematical Rendering
-- Custom `KatexWebView` rendering mathematical expressions in authentic **Computer Modern (CMU Serif)** typography.
-- Dynamic JavaScript height resizing ensures smooth inline rendering without layout shifts or clipped equations.
-- Seamless presentation of multi-line theorem environments, proofs, summation bounds, and modular notation.
+### 2. Offline KaTeX Mathematical Rendering & Structural Macros
+- **100% Offline Asset Bundling**: KaTeX JavaScript, CSS stylesheets, and all 20 WOFF2/TTF Computer Modern font binaries are bundled locally in the application assets, eliminating CDN latency and enabling offline functionality.
+- **Zero FOUC (Flash of Unstyled Content)**: Views initialize with zero opacity and smoothly transition to full visibility only after equation rendering and font layout are complete.
+- **Structural Environment Macros**: Extends KaTeX rendering with custom structural environments, rendering `\section{}`, `\subsection{}`, `\begin{theorem}...\end{theorem}`, and `\begin{lemma}...\end{lemma}` as styled academic cards with accent borders and distinct backgrounds.
+- **Dynamic Auto-Sizing**: Bidirectional JavaScript-Android bridge dynamically recalculates document height to prevent tall equations, fractions, and matrices from clipping.
 
-### 3. Progressive Pedagogical Hints System
-- Problems include multi-tiered progressive hints designed as conceptual stepping stones.
-- Students can unlock hints sequentially without spoiling the final numerical or algebraic solution.
+### 3. Dual Problem Evaluation Engine (Objective & Subjective)
+- **Objective Grading**: Evaluates numerical, modular, and short integer responses directly against verified answer keys.
+- **Subjective Short-Answer Semantic Grading**: Employs an LLM grading prompt to accept mathematically equivalent answers regardless of student phrasing (e.g., recognizing "Such a configuration does not exist", "0 solutions", "None", and "Impossible" as strictly equivalent).
+- **Subjective Proof Validation**: Presents full official Olympiad proofs with structured lemmas, allowing students to compare proofs and perform structured self-validation without rating penalties.
 
-### 4. Euler AI Tutor (LLM Integration)
-- Powered by Retrofit and OpenAI/LLM endpoints.
-- **Hard-Stuck Trigger**: Automatically diagnoses errors and provides a custom hint when a student submits 3 consecutive incorrect attempts.
-- **Socratic Prompt Engineering**: The tutor analyzes previous attempts to identify false lemmas and nudges the student in the right direction without giving away the answer.
-
-### 5. Database Pre-population & Seed Data
+### 4. Database Pre-population & Seed Data
 - Pre-loaded with authentic **IOQM / RMO / INMO** questions across all 4 categories directly from `assets/questions_seed.json`.
-- Automatically seeded on the very first launch via Room's database lifecycle callback.
+- Streamed in memory-safe chunks and automatically seeded on the very first launch via Room's database lifecycle callback.
 
-### 6. Jetpack Navigation & Bottom Navigation
+### 5. Jetpack Navigation & Bottom Navigation
 - Full Jetpack Navigation Graph routing between:
   - **Dashboard**: Radar profile, aggregate Elo, topic rating breakdown, and quick action cards.
-  - **Practice Arena**: Interactive math arena with KaTeX WebView, quick-syntax keypad, progressive hints, and submission verification.
+  - **Practice Arena**: Interactive math arena with offline KaTeX WebView, quick-syntax keypad, and centered evaluation overlays.
   - **Theory Monographs**: Academic theory reader covering advanced lemmas (e.g., Alon's Nullstellensatz, Vieta Jumping, Barycentric Coordinates).
 
 ## Architecture & Tech Stack
@@ -58,7 +56,7 @@ com.locus.olympiad
 │   └── SeedDataParser     # Asset JSON parser for pre-populated problems
 ├── di                     # Dagger-Hilt DI Modules (NetworkModule, DatabaseModule)
 ├── domain
-│   ├── ai                 # AI Tutor Repository & Pedagogical Prompt Builder
+│   ├── ai                 # AI Evaluator Repository & Semantic Grading Models
 │   └── elo                # Logistic Elo Calculator & Window Matchmaker
 ├── network
 │   ├── model              # OpenAI Chat Completion Request/Response DTOs
@@ -69,13 +67,13 @@ com.locus.olympiad
 │   ├── dashboard          # DashboardActivity & DashboardFragment
 │   ├── main               # MainActivity (NavHostFragment & BottomNavigationView)
 │   ├── math               # KatexWebView & DataBinding Adapters
-│   ├── practice           # PracticeActivity & PracticeFragment
+│   ├── practice           # PracticeActivity, PracticeFragment & PracticeConfigBottomSheet
 │   └── theory             # TheoryActivity & TheoryFragment
 └── viewmodel              # PracticeViewModel, DashboardViewModel, UiStates
 ```
 
 | Component | Library / Framework | Version |
-| | | |
+|---|---|---|
 | **Language** | Kotlin | `1.9.23` |
 | **Build System** | Gradle (Kotlin DSL) / AGP | `8.3.2` |
 | **Min / Target SDK** | Android 7.0 (API 24) / Android 14 (API 34) | `24` / `34` |
@@ -108,13 +106,13 @@ com.locus.olympiad
    # Location of your Android SDK
    sdk.dir=C\:\\Users\\<YourUsername>\\AppData\\Local\\Android\\Sdk
 
-   # LLM API Key for the Euler AI Tutor (OpenAI API key)
+   # LLM API Key for the AI Subjective Evaluator (OpenAI API key)
    OPENAI_API_KEY=sk-your-openai-api-key-here
    # Or alternatively:
    LLM_API_KEY=sk-your-openai-api-key-here
    ```
    > [!NOTE]
-   > `local.properties` is strictly ignored by `.gitignore` to guarantee your API key remains secure and never gets checked into version control. If no key is set, the app compiles cleanly with AI tutor calls failing gracefully without crashes.
+   > `local.properties` is strictly ignored by `.gitignore` to guarantee your API key remains secure and never gets checked into version control. If no key is set, the app compiles cleanly with semantic evaluations falling back to rule-based mathematical matching.
 
 3. **Open & Sync in Android Studio**:
    - Launch Android Studio and choose **Open Project**.
@@ -130,7 +128,7 @@ com.locus.olympiad
 
 ## Running Unit Tests
 
-To run the full suite of unit tests (testing the Elo rating calculator, AI Tutor prompt generator, progressive hints ViewModel state, and seed data parser):
+To run the full suite of unit tests (testing the Elo rating calculator, subjective proof self-evaluation, session progression, and seed data parser):
 
 ```bash
 ./gradlew test

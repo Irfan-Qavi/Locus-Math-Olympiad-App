@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName
 /**
  * Practice question for IOQM/RMO/IMO math olympiad preparation.
  * Contains LaTeX problem statement, Elo difficulty rating, question type
- * (Objective, Subjective Short, Subjective Proof), correct answer, and progressive hints.
+ * (Objective, Subjective Short, Subjective Proof), and official solutions.
  */
 @Entity(tableName = "practice_questions")
 data class PracticeQuestion(
@@ -32,10 +32,6 @@ data class PracticeQuestion(
     @ColumnInfo(name = "correct_answer")
     @SerializedName("correct_answer", alternate = ["correctAnswer"])
     val correctAnswer: String,
-
-    @ColumnInfo(name = "list_of_hints")
-    @SerializedName("list_of_hints", alternate = ["listOfHints"])
-    val listOfHints: List<String> = emptyList(),
 
     @ColumnInfo(name = "source_contest")
     @SerializedName("source_contest", alternate = ["sourceContest"])

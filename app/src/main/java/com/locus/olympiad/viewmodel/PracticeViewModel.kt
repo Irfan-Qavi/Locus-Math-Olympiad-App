@@ -37,8 +37,6 @@ class PracticeViewModel @Inject constructor(
                 sessionNetEloDelta = 0,
                 isSessionCompleted = false,
                 incorrectAttempts = emptyList(),
-                isHardStuck = false,
-                aiTutorHint = null,
                 lastSubmissionCorrect = null,
                 lastEloDelta = null,
                 isProofSolutionRevealed = false
@@ -60,8 +58,7 @@ class PracticeViewModel @Inject constructor(
                 it.copy(
                     isSessionCompleted = true,
                     lastSubmissionCorrect = null,
-                    lastEloDelta = null,
-                    isProofSolutionRevealed = false
+                    lastEloDelta = null
                 )
             }
         } else {
@@ -73,7 +70,7 @@ class PracticeViewModel @Inject constructor(
                     isProofSolutionRevealed = false
                 )
             }
-            loadNextQuestion(_uiState.value.sessionConfig.topic)
+            loadNextQuestion(config.topic)
         }
     }
 
@@ -91,10 +88,7 @@ class PracticeViewModel @Inject constructor(
                         current.copy(
                             currentQuestion = question,
                             isLoadingQuestion = false,
-                            revealedHintsCount = 0,
                             incorrectAttempts = emptyList(),
-                            isHardStuck = false,
-                            aiTutorHint = null,
                             lastSubmissionCorrect = null,
                             lastEloDelta = null,
                             userDraftAnswer = "",
@@ -122,23 +116,6 @@ class PracticeViewModel @Inject constructor(
     }
 
     /**
-     * Manages the progressive hint revelation system.
-     */
-    fun revealNextHint() {
-        _uiState.update { current ->
-            if (current.hasMoreHints) {
-                val nextCount = current.revealedHintsCount + 1
-                current.copy(
-                    revealedHintsCount = nextCount,
-                    feedbackMessage = "Hint $nextCount unlocked."
-                )
-            } else {
-                current.copy(feedbackMessage = "All hints have already been revealed.")
-            }
-        }
-    }
-
-    /**
      * Updates the user's draft answer as they type or tap quick-syntax keys.
      */
     fun updateDraftAnswer(answer: String) {
@@ -160,32 +137,35 @@ class PracticeViewModel @Inject constructor(
     }
 
     /**
-     * Reveals the full solution and canonical proof for Subjective Type B questions.
+     * Reveals the official proof solution for Subjective Proof questions.
      */
     fun revealProofSolution() {
         _uiState.update { it.copy(isProofSolutionRevealed = true) }
     }
 
     /**
-     * Records self-evaluation for Subjective Type B (Prove That) questions.
-     * Proof-based questions carry neutral Elo (0 delta).
+     * Submits self-evaluation for Subjective Proof problems (True = Valid proof, False = Incomplete).
      */
-    fun submitProofSelfEvaluation(isValid: Boolean) {
+    fun submitProofSelfEvaluation(isValidProof: Boolean) {
         val question = _uiState.value.currentQuestion ?: return
         viewModelScope.launch {
             _uiState.update { it.copy(isEvaluatingAnswer = true) }
             try {
-                val (_, eloResult) = matchmakingRepository.submitAnswer(
+                val answerString = if (isValidProof) "PROVED" else "INCOMPLETE"
+                val (isCorrect, eloResult) = matchmakingRepository.submitAnswer(
                     question = question,
-                    submittedAnswer = if (isValid) "VALID" else "INCOMPLETE"
+                    submittedAnswer = answerString
                 )
+
                 _uiState.update { current ->
                     current.copy(
+                        userElo = eloResult.newElo,
+                        lastSubmissionCorrect = isCorrect,
+                        lastEloDelta = eloResult.delta,
+                        sessionSolvedCount = if (isCorrect) current.sessionSolvedCount + 1 else current.sessionSolvedCount,
+                        sessionNetEloDelta = current.sessionNetEloDelta + eloResult.delta,
                         isEvaluatingAnswer = false,
-                        lastSubmissionCorrect = isValid,
-                        lastEloDelta = 0,
-                        sessionSolvedCount = if (isValid) current.sessionSolvedCount + 1 else current.sessionSolvedCount,
-                        feedbackMessage = if (isValid) "Proof self-evaluated as valid. Solved count updated." else "Proof marked for review. Neutral Elo preserved."
+                        feedbackMessage = if (isCorrect) "Proof self-validated as correct." else "Proof marked incomplete for review."
                     )
                 }
             } catch (e: Exception) {
@@ -200,39 +180,24 @@ class PracticeViewModel @Inject constructor(
     }
 
     /**
-     * Handles candidate solution submission across Objective, Subjective Short, and Proof questions.
+     * Evaluates a student's submitted answer (Objective or Subjective Short).
      */
-    fun submitAnswer(submittedAnswer: String = _uiState.value.userDraftAnswer) {
+    fun submitAnswer(candidateAnswer: String) {
         val question = _uiState.value.currentQuestion ?: return
-
-        // If proof question, trigger proof reveal
-        if (question.resolvedType == QuestionType.SUBJECTIVE_PROOF) {
-            revealProofSolution()
-            return
-        }
-
-        val trimmedAnswer = submittedAnswer.trim()
+        val trimmedAnswer = candidateAnswer.trim()
         if (trimmedAnswer.isBlank()) {
-            _uiState.update { it.copy(feedbackMessage = "Please enter a candidate solution before submitting.") }
+            _uiState.update { it.copy(feedbackMessage = "Please provide an answer before submitting.") }
             return
-        }
-
-        // Strict 0..99 integer validation for Objective questions
-        if (question.resolvedType == QuestionType.OBJECTIVE) {
-            val intVal = trimmedAnswer.toIntOrNull()
-            if (intVal == null || intVal !in 0..99) {
-                _uiState.update { it.copy(feedbackMessage = "Answer must be strictly an integer between 0 and 99.") }
-                return
-            }
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isEvaluatingAnswer = true, feedbackMessage = null, errorMessage = null) }
+            _uiState.update { it.copy(isEvaluatingAnswer = true, feedbackMessage = null) }
             try {
-                // Route to AI Tutor semantic evaluation if question is Subjective Short Answer
-                val semanticCorrect = if (question.resolvedType == QuestionType.SUBJECTIVE_SHORT) {
-                    aiTutorRepository.evaluateSubjectiveAnswer(question, trimmedAnswer).getOrNull()
-                } else null
+                var semanticCorrect: Boolean? = null
+                if (question.resolvedType == QuestionType.SUBJECTIVE_SHORT) {
+                    val aiResult = aiTutorRepository.evaluateSubjectiveAnswer(question, trimmedAnswer)
+                    semanticCorrect = aiResult.getOrNull()
+                }
 
                 val (isCorrect, eloResult) = matchmakingRepository.submitAnswer(
                     question = question,
@@ -250,15 +215,11 @@ class PracticeViewModel @Inject constructor(
                             sessionNetEloDelta = current.sessionNetEloDelta + eloResult.delta,
                             isEvaluatingAnswer = false,
                             feedbackMessage = "Correct! Master Elo increased by +${eloResult.delta} pts (${eloResult.newElo}).",
-                            incorrectAttempts = emptyList(),
-                            isHardStuck = false,
-                            aiTutorHint = null
+                            incorrectAttempts = emptyList()
                         )
                     }
                 } else {
                     val updatedAttempts = _uiState.value.incorrectAttempts + trimmedAnswer
-                    val isStuck = updatedAttempts.size >= 3
-
                     _uiState.update { current ->
                         current.copy(
                             userElo = eloResult.newElo,
@@ -267,13 +228,8 @@ class PracticeViewModel @Inject constructor(
                             sessionNetEloDelta = current.sessionNetEloDelta + eloResult.delta,
                             isEvaluatingAnswer = false,
                             feedbackMessage = "Incorrect (${eloResult.delta} pts). Re-examine your lemmas.",
-                            incorrectAttempts = updatedAttempts,
-                            isHardStuck = isStuck
+                            incorrectAttempts = updatedAttempts
                         )
-                    }
-
-                    if (isStuck) {
-                        triggerAiTutorHint(question, eloResult.newElo, updatedAttempts)
                     }
                 }
             } catch (e: Exception) {
@@ -281,40 +237,6 @@ class PracticeViewModel @Inject constructor(
                     it.copy(
                         isEvaluatingAnswer = false,
                         errorMessage = "Submission evaluation failed: ${e.localizedMessage}"
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * Triggers the AI Tutor API request when hard-stuck.
-     */
-    fun triggerAiTutorHint(
-        question: PracticeQuestion = _uiState.value.currentQuestion!!,
-        userElo: Int = _uiState.value.userElo,
-        incorrectAttempts: List<String> = _uiState.value.incorrectAttempts
-    ) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoadingAiHint = true) }
-            val result = aiTutorRepository.getConceptualHint(
-                question = question,
-                userElo = userElo,
-                incorrectAttempts = incorrectAttempts
-            )
-            result.onSuccess { hintSentence ->
-                _uiState.update {
-                    it.copy(
-                        isLoadingAiHint = false,
-                        aiTutorHint = hintSentence,
-                        feedbackMessage = "Locus AI Tutor has diagnosed your attempts and generated a conceptual stepping stone."
-                    )
-                }
-            }.onFailure { error ->
-                _uiState.update {
-                    it.copy(
-                        isLoadingAiHint = false,
-                        errorMessage = "AI Tutor request failed: ${error.localizedMessage}"
                     )
                 }
             }

@@ -5,9 +5,7 @@
     <string name="category_geometry">Geometry</string>
     <string name="category_combinatorics">Combinatorics</string>
     <string name="category_number_theory">Number Theory</string>
-    <string name="reveal_hint">Reveal Hint</string>
     <string name="submit_verification">Submit Verification</string>
-    <string name="ai_tutor_hint_title">AI Olympiad Tutor Hint</string>
     <string name="correct_answer_toast">Correct! Master Elo increased.</string>
     <string name="incorrect_answer_toast">Incorrect. Try working through the lemmas.</string>
 </resources>

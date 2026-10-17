@@ -58,11 +58,6 @@ object DatabaseInitializer {
 ${'$'}${'$'}e(A, B) \ge \left\lceil \frac{|A| \cdot |B|}{n - 1} \right\rceil + \sum_{v \in A} \operatorname{deg}(v) \pmod 2${'$'}${'$'}
 Determine the minimum possible chromatic number ${'$'}\chi(G)${'$'} across all such graphs.""",
                 correctAnswer = "3",
-                listOfHints = listOf(
-                    """Consider the parity of the degree sum over ${'$'}A${'$'} and examine the case where ${'$'}G${'$'} contains an Eulerian sub-graph.""",
-                    """If ${'$'}\chi(G) = 2${'$'}, then ${'$'}G${'$'} is bipartite. Partition ${'$'}V${'$'} into the two color classes and check whether the parity constraint can hold for all cuts.""",
-                    """Notice that a cycle ${'$'}C_5${'$'} or ${'$'}K_3${'$'} requires at least 3 colors. Test if ${'$'}\chi(G)=3${'$'} satisfies the lower bound by constructing an admissible 3-chromatic triangulation."""
-                ),
                 source = "International Olympiad Training • Tier III",
                 tier = "Tier III"
             ),
@@ -73,11 +68,6 @@ Determine the minimum possible chromatic number ${'$'}\chi(G)${'$'} across all s
                 latexContent = """Find the number of permutations ${'$'}\pi${'$'} of ${'$'}\{1, 2, \dots, 6\}${'$'} such that for all ${'$'}1 \le k \le 5${'$'}:
 ${'$'}${'$'}|\pi(k) - \pi(k+1)| \ne 1${'$'}${'$'}""",
                 correctAnswer = "90",
-                listOfHints = listOf(
-                    """Use the Principle of Inclusion-Exclusion (PIE) on the conditions that adjacent elements are consecutive.""",
-                    """Let ${'$'}A_i${'$'} be the property that ${'$'}|\pi(i) - \pi(i+1)| = 1${'$'}. Count the intersections by grouping adjacent pairs into blocks.""",
-                    """Evaluate ${'$'}\sum_{k=0}^5 (-1)^k N(k)${'$'} using the number of ways to place ${'$'}k${'$'} disjoint domino tiles."""
-                ),
                 source = "IOQM Final Stage",
                 tier = "Tier II"
             ),
@@ -89,11 +79,6 @@ ${'$'}${'$'}|\pi(k) - \pi(k+1)| \ne 1${'$'}${'$'}""",
 ${'$'}${'$'}\begin{cases} x^3 - y^3 = 7 \\ x^2 y - x y^2 = 2 \end{cases}${'$'}${'$'}
 What is the maximum value of ${'$'}x + y${'$'}?""",
                 correctAnswer = "3",
-                listOfHints = listOf(
-                    """Notice that ${'$'}x^3 - 3x^2y + 3xy^2 - y^3 = (x - y)^3${'$'}.""",
-                    """Compute ${'$'}(x - y)^3 = (x^3 - y^3) - 3(x^2y - xy^2) = 7 - 3(2) = 1${'$'}. Thus ${'$'}x - y = 1${'$'}.""",
-                    """Substitute ${'$'}x = y + 1${'$'} into ${'$'}xy(x - y) = 2${'$'} to find ${'$'}y(y + 1) = 2${'$'}, giving roots ${'$'}y = 1${'$'} or ${'$'}y = -2${'$'}."""
-                ),
                 source = "RMO Algebra Round",
                 tier = "Tier II"
             ),
@@ -104,11 +89,6 @@ What is the maximum value of ${'$'}x + y${'$'}?""",
                 latexContent = """Let ${'$'}P(x)${'$'} be a polynomial with integer coefficients such that ${'$'}P(1) = 2024${'$'} and ${'$'}P(2024) = 1${'$'}. 
 If ${'$'}P(k) = k${'$'} for some integer ${'$'}k${'$'}, find the value of ${'$'}k${'$'} (Enter 'No solution' if none exists).""",
                 correctAnswer = "No solution",
-                listOfHints = listOf(
-                    """Recall the fundamental integer polynomial divisibility property: ${'$'}(a - b) \mid (P(a) - P(b))${'$'} for distinct integers ${'$'}a, b${'$'}.""",
-                    """Apply this property to pairs ${'$'}(k, 1)${'$'} and ${'$'}(k, 2024)${'$'}.""",
-                    """Analyze whether ${'$'}(k - 1) \mid (k - 2024)${'$'} and ${'$'}(k - 2024) \mid (k - 1)${'$'} can both hold simultaneously."""
-                ),
                 source = "IOQM National Camp",
                 tier = "Tier III"
             ),
@@ -124,11 +104,6 @@ ${'$'}${'$'}\sum_{cyc} \frac{a}{b+c} = \sum_{cyc} \frac{a^2}{ab + ac} \ge \frac{
 Since ${'$'}(a+b+c)^2 \ge 3(ab+bc+ca)${'$'}, we have:
 ${'$'}${'$'}\frac{(a+b+c)^2}{2(ab+bc+ca)} \ge \frac{3}{2}${'$'}${'$'}
 Equality holds if and only if ${'$'}a = b = c${'$'}.""",
-                listOfHints = listOf(
-                    """Consider rewriting each term by adding 1: ${'$'}\frac{a}{b+c} + 1 = \frac{a+b+c}{b+c}${'$'}.""",
-                    """Apply Cauchy-Schwarz inequality or AM-HM inequality to ${'$'}\sum \frac{1}{b+c}${'$'}.""",
-                    """Alternatively, apply Sedrakyan's lemma (Cauchy-Schwarz in Engel form)."""
-                ),
                 source = "Nesbitt's Classical Lemma • Tier II",
                 tier = "Tier II"
             ),
@@ -138,11 +113,6 @@ Equality holds if and only if ${'$'}a = b = c${'$'}.""",
                 questionType = "OBJECTIVE",
                 latexContent = """Find the remainder when ${'$'}2^{2026} + 3^{2026}${'$'} is divided by ${'$'}13${'$'}.""",
                 correctAnswer = "0",
-                listOfHints = listOf(
-                    """Apply Fermat's Little Theorem: for prime ${'$'}p=13${'$'} and ${'$'}\gcd(a, 13) = 1${'$'}, ${'$'}a^{12} \equiv 1 \pmod{13}${'$'}.""",
-                    """Reduce the exponent ${'$'}2026${'$'} modulo ${'$'}12${'$'}: ${'$'}2026 = 12 \times 168 + 10${'$'}.""",
-                    """Calculate ${'$'}2^{10} \pmod{13}${'$'} and ${'$'}3^{10} \pmod{13}${'$'} and sum them up modulo 13."""
-                ),
                 source = "IOQM Prelims",
                 tier = "Tier I"
             ),
@@ -154,11 +124,6 @@ Equality holds if and only if ${'$'}a = b = c${'$'}.""",
 ${'$'}${'$'}p^2 - 2q^2 = 1${'$'}${'$'}
 What is the sum ${'$'}p + q${'$'}?""",
                 correctAnswer = "5",
-                listOfHints = listOf(
-                    """Rewrite the equation as ${'$'}p^2 - 1 = 2q^2${'$'}, which factors as ${'$'}(p - 1)(p + 1) = 2q^2${'$'}.""",
-                    """Consider the parity of ${'$'}p${'$'}. If ${'$'}p=2${'$'}, ${'$'}4 - 2q^2 = 1${'$'} has no prime solution. Thus ${'$'}p${'$'} must be odd.""",
-                    """Since ${'$'}p${'$'} is odd, both ${'$'}p - 1${'$'} and ${'$'}p + 1${'$'} are consecutive even integers. Analyze the distribution of factors of ${'$'}2q^2${'$'} to deduce ${'$'}q = 2${'$'} and ${'$'}p = 3${'$'}."""
-                ),
                 source = "RMO Number Theory",
                 tier = "Tier II"
             ),
@@ -168,11 +133,6 @@ What is the sum ${'$'}p + q${'$'}?""",
                 questionType = "OBJECTIVE",
                 latexContent = """In acute triangle ${'$'}\triangle ABC${'$'}, let ${'$'}H${'$'} be the orthocenter and ${'$'}O${'$'} the circumcenter. If ${'$'}\angle A = 60^\circ${'$'} and ${'$'}BC = 12${'$'}, compute the length of the segment ${'$'}OH${'$'}.""",
                 correctAnswer = "12",
-                listOfHints = listOf(
-                    """Recall Euler's triangle formula or the relation between ${'$'}AH${'$'} and circumradius ${'$'}R${'$'}: ${'$'}AH = 2R \cos A${'$'}.""",
-                    """For ${'$'}\angle A = 60^\circ${'$'}, ${'$'}\cos 60^\circ = 1/2${'$'}, so ${'$'}AH = R${'$'}.""",
-                    """Notice that in quadrilateral ${'$'}AHCO${'$'} or by the distance formula ${'$'}OH^2 = 9R^2 - (a^2+b^2+c^2)${'$'}, what is ${'$'}R${'$'} when ${'$'}a=12${'$'} and ${'$'}\angle A=60^\circ${'$'}? ${'$'}a = 2R \sin 60^\circ${'$'}, giving ${'$'}R = 4\sqrt{3}${'$'}."""
-                ),
                 source = "RMO Geometry",
                 tier = "Tier II"
             ),
@@ -182,11 +142,6 @@ What is the sum ${'$'}p + q${'$'}?""",
                 questionType = "SUBJECTIVE_SHORT",
                 latexContent = """Let ${'$'}\Gamma${'$'} be the incircle of ${'$'}\triangle ABC${'$'} tangent to ${'$'}BC, CA, AB${'$'} at ${'$'}D, E, F${'$'} respectively. If ${'$'}AB = 13${'$'}, ${'$'}BC = 14${'$'}, ${'$'}CA = 15${'$'}, compute the area of ${'$'}\triangle DEF${'$'}.""",
                 correctAnswer = "84/5",
-                listOfHints = listOf(
-                    """First compute the area and inradius of ${'$'}\triangle ABC${'$'} using Heron's formula: ${'$'}s = 21, \Delta = 84, r = 4${'$'}.""",
-                    """Use contact triangle properties: ${'$'}AE = AF = s - a = 7${'$'}, ${'$'}BD = BF = s - b = 8${'$'}, ${'$'}CD = CE = s - c = 6${'$'}.""",
-                    """Express Area(${'$'}\triangle DEF${'$'}) in terms of ${'$'}\triangle ABC${'$'} by subtracting the outer vertex triangles or using the formula ${'$'}\frac{r \cdot \text{Area}(\triangle ABC)}{2R}${'$'}."""
-                ),
                 source = "IOQM National Level",
                 tier = "Tier III"
             )

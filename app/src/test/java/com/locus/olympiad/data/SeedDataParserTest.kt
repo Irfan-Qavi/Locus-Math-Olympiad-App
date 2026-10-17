@@ -44,7 +44,6 @@ class SeedDataParserTest {
         assertEquals(1080, q1.difficultyElo)
         assertEquals("Find the number of permutations $\\pi$.", q1.latexContent)
         assertEquals("90", q1.correctAnswer)
-        assertEquals(2, q1.listOfHints.size)
         assertEquals("IOQM Final Stage", q1.sourceContest)
         assertEquals("Tier II", q1.tier)
 
@@ -80,7 +79,6 @@ class SeedDataParserTest {
             assertTrue("difficulty_elo must be positive", question.difficultyElo > 0)
             assertTrue("latex_content must not be blank", question.latexContent.isNotBlank())
             assertTrue("correct_answer must not be blank", question.correctAnswer.isNotBlank())
-            assertTrue("list_of_hints must not be empty", question.listOfHints.isNotEmpty())
         }
     }
 }
