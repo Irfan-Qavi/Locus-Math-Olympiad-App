@@ -1,6 +1,7 @@
 package com.locus.olympiad.ui.practice
 
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import com.locus.olympiad.R
 import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.data.model.PracticeSessionConfig
+import com.locus.olympiad.data.model.QuestionType
 import com.locus.olympiad.databinding.ActivityPracticeBinding
 import com.locus.olympiad.viewmodel.PracticeUiState
 import com.locus.olympiad.viewmodel.PracticeViewModel
@@ -31,6 +33,7 @@ class PracticeFragment : Fragment() {
     private val viewModel: PracticeViewModel by viewModels()
 
     private var currentRenderedQuestionId: Long? = null
+    private var currentRenderedProofId: Long? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,6 +74,19 @@ class PracticeFragment : Fragment() {
         binding.btnSubmitAnswer.setOnClickListener {
             val answer = binding.etAnswer.text?.toString().orEmpty()
             viewModel.submitAnswer(answer)
+        }
+
+        // Subjective Type B (Prove That) Listeners
+        binding.btnSolveProof.setOnClickListener {
+            viewModel.revealProofSolution()
+        }
+
+        binding.btnProofValid.setOnClickListener {
+            viewModel.submitProofSelfEvaluation(true)
+        }
+
+        binding.btnProofIncomplete.setOnClickListener {
+            viewModel.submitProofSelfEvaluation(false)
         }
 
         // Evaluation Result Modal Actions
@@ -136,6 +152,57 @@ class PracticeFragment : Fragment() {
             binding.tvProblemTag.text = "PROBLEM #${question.id}"
             binding.tvProblemTier.text = question.tier
 
+            // Question Type Badge
+            val qType = question.resolvedType
+            binding.tvQuestionTypeBadge.text = when (qType) {
+                QuestionType.OBJECTIVE -> "OBJECTIVE [0-99]"
+                QuestionType.SUBJECTIVE_SHORT -> "SHORT ANSWER"
+                QuestionType.SUBJECTIVE_PROOF -> "PROVE THAT"
+            }
+
+            // Optional Source Attribution
+            val src = question.source ?: question.sourceContest
+            if (!src.isNullOrBlank()) {
+                binding.tvProblemSource.isVisible = true
+                binding.tvProblemSource.text = "• $src"
+            } else {
+                binding.tvProblemSource.isVisible = false
+            }
+
+            // Split UI Engine based on QuestionType
+            when (qType) {
+                QuestionType.OBJECTIVE -> {
+                    binding.containerAnswerInput.isVisible = true
+                    binding.btnSolveProof.isVisible = false
+                    binding.cardProofSolution.isVisible = false
+                    binding.tvAnswerFormatNote.isVisible = true
+                    binding.tvAnswerFormatNote.text = "Answer must be strictly between 0 and 99"
+                    binding.etAnswer.inputType = InputType.TYPE_CLASS_NUMBER
+                    binding.containerQuickKeys.isVisible = false
+                }
+                QuestionType.SUBJECTIVE_SHORT -> {
+                    binding.containerAnswerInput.isVisible = true
+                    binding.btnSolveProof.isVisible = false
+                    binding.cardProofSolution.isVisible = false
+                    binding.tvAnswerFormatNote.isVisible = true
+                    binding.tvAnswerFormatNote.text = "Semantic AI evaluation enabled. Phrasing variations accepted."
+                    binding.etAnswer.inputType = InputType.TYPE_CLASS_TEXT
+                    binding.containerQuickKeys.isVisible = false
+                }
+                QuestionType.SUBJECTIVE_PROOF -> {
+                    binding.containerAnswerInput.isVisible = false
+                    binding.tvAnswerFormatNote.isVisible = false
+                    binding.btnSolveProof.isVisible = !state.isProofSolutionRevealed
+                    binding.cardProofSolution.isVisible = state.isProofSolutionRevealed
+
+                    if (state.isProofSolutionRevealed && currentRenderedProofId != question.id) {
+                        currentRenderedProofId = question.id
+                        val proofText = question.proofSolution ?: question.correctAnswer
+                        binding.webViewProofMath.setLatexContent(proofText)
+                    }
+                }
+            }
+
             if (currentRenderedQuestionId != question.id) {
                 currentRenderedQuestionId = question.id
                 binding.webViewProblemMath.setLatexContent(question.latexContent)
@@ -188,19 +255,23 @@ class PracticeFragment : Fragment() {
                 binding.tvEvaluationTitle.text = "Correct Solution!"
                 val delta = state.lastEloDelta ?: 0
                 val deltaSign = if (delta >= 0) "+$delta" else "$delta"
-                binding.tvEvaluationEloDelta.text = "$deltaSign Elo Rating (Now ${state.userElo})"
-                binding.tvEvaluationMessage.text = "Your solution matches the official Olympiad answer key. Outstanding precision."
+                binding.tvEvaluationEloDelta.text = if (state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF) {
+                    "Neutral Rating (0 Elo Delta)"
+                } else {
+                    "$deltaSign Elo Rating (Now ${state.userElo})"
+                }
+                binding.tvEvaluationMessage.text = state.feedbackMessage ?: "Your solution matches the official Olympiad answer key. Outstanding precision."
                 binding.btnEvaluationNext.isVisible = true
                 binding.btnEvaluationRetry.isVisible = false
             } else {
                 binding.ivEvaluationStatus.setImageResource(R.drawable.ic_cancel_circle)
-                binding.tvEvaluationTitle.text = "Incorrect Answer"
+                binding.tvEvaluationTitle.text = if (state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF) "Proof Under Review" else "Incorrect Answer"
                 val delta = state.lastEloDelta ?: 0
                 val deltaSign = if (delta >= 0) "+$delta" else "$delta"
-                binding.tvEvaluationEloDelta.text = "$deltaSign Elo Rating"
-                binding.tvEvaluationMessage.text = "Re-examine your lemmas and calculations. Keep trying!"
-                binding.btnEvaluationNext.isVisible = false
-                binding.btnEvaluationRetry.isVisible = true
+                binding.tvEvaluationEloDelta.text = if (state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF) "Neutral Rating (0 Elo Delta)" else "$deltaSign Elo Rating"
+                binding.tvEvaluationMessage.text = state.feedbackMessage ?: "Re-examine your lemmas and calculations. Keep trying!"
+                binding.btnEvaluationNext.isVisible = state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF
+                binding.btnEvaluationRetry.isVisible = state.currentQuestion?.resolvedType != QuestionType.SUBJECTIVE_PROOF
             }
         } else {
             binding.overlayEvaluationResult.isVisible = false
@@ -218,13 +289,6 @@ class PracticeFragment : Fragment() {
         }
 
         // Feedback / Toast
-        state.feedbackMessage?.let { msg ->
-            binding.tvFeedback.isVisible = true
-            binding.tvFeedback.text = msg
-        } ?: run {
-            binding.tvFeedback.isVisible = false
-        }
-
         state.errorMessage?.let { errorMsg ->
             Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_SHORT).show()
         }

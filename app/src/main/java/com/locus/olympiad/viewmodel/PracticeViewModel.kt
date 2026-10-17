@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.data.model.PracticeQuestion
 import com.locus.olympiad.data.model.PracticeSessionConfig
+import com.locus.olympiad.data.model.QuestionType
 import com.locus.olympiad.domain.ai.AiTutorRepository
 import com.locus.olympiad.repository.MatchmakingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,7 +40,8 @@ class PracticeViewModel @Inject constructor(
                 isHardStuck = false,
                 aiTutorHint = null,
                 lastSubmissionCorrect = null,
-                lastEloDelta = null
+                lastEloDelta = null,
+                isProofSolutionRevealed = false
             )
         }
         loadNextQuestion(config.topic)
@@ -58,7 +60,8 @@ class PracticeViewModel @Inject constructor(
                 it.copy(
                     isSessionCompleted = true,
                     lastSubmissionCorrect = null,
-                    lastEloDelta = null
+                    lastEloDelta = null,
+                    isProofSolutionRevealed = false
                 )
             }
         } else {
@@ -66,7 +69,8 @@ class PracticeViewModel @Inject constructor(
                 it.copy(
                     sessionQuestionIndex = currentIndex + 1,
                     lastSubmissionCorrect = null,
-                    lastEloDelta = null
+                    lastEloDelta = null,
+                    isProofSolutionRevealed = false
                 )
             }
             loadNextQuestion(_uiState.value.sessionConfig.topic)
@@ -94,7 +98,8 @@ class PracticeViewModel @Inject constructor(
                             lastSubmissionCorrect = null,
                             lastEloDelta = null,
                             userDraftAnswer = "",
-                            feedbackMessage = null
+                            feedbackMessage = null,
+                            isProofSolutionRevealed = false
                         )
                     }
                 } else {
@@ -118,7 +123,6 @@ class PracticeViewModel @Inject constructor(
 
     /**
      * Manages the progressive hint revelation system.
-     * When the user clicks "Reveal Hint", increment revealedHintsCount and expose the next hint string.
      */
     fun revealNextHint() {
         _uiState.update { current ->
@@ -156,25 +160,85 @@ class PracticeViewModel @Inject constructor(
     }
 
     /**
-     * Handles candidate solution submission.
-     * 1. Validates answer against correct_answer.
-     * 2. Computes and updates Elo in Room DB.
-     * 3. Hard-stuck check: if incorrect, appends to incorrectAttempts.
-     *    If incorrectAttempts.size >= 3, flips isHardStuck to true and automatically triggers AI Tutor API.
+     * Reveals the full solution and canonical proof for Subjective Type B questions.
+     */
+    fun revealProofSolution() {
+        _uiState.update { it.copy(isProofSolutionRevealed = true) }
+    }
+
+    /**
+     * Records self-evaluation for Subjective Type B (Prove That) questions.
+     * Proof-based questions carry neutral Elo (0 delta).
+     */
+    fun submitProofSelfEvaluation(isValid: Boolean) {
+        val question = _uiState.value.currentQuestion ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isEvaluatingAnswer = true) }
+            try {
+                val (_, eloResult) = matchmakingRepository.submitAnswer(
+                    question = question,
+                    submittedAnswer = if (isValid) "VALID" else "INCOMPLETE"
+                )
+                _uiState.update { current ->
+                    current.copy(
+                        isEvaluatingAnswer = false,
+                        lastSubmissionCorrect = isValid,
+                        lastEloDelta = 0,
+                        sessionSolvedCount = if (isValid) current.sessionSolvedCount + 1 else current.sessionSolvedCount,
+                        feedbackMessage = if (isValid) "Proof self-evaluated as valid. Solved count updated." else "Proof marked for review. Neutral Elo preserved."
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isEvaluatingAnswer = false,
+                        errorMessage = "Self-evaluation failed: ${e.localizedMessage}"
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Handles candidate solution submission across Objective, Subjective Short, and Proof questions.
      */
     fun submitAnswer(submittedAnswer: String = _uiState.value.userDraftAnswer) {
+        val question = _uiState.value.currentQuestion ?: return
+
+        // If proof question, trigger proof reveal
+        if (question.resolvedType == QuestionType.SUBJECTIVE_PROOF) {
+            revealProofSolution()
+            return
+        }
+
         val trimmedAnswer = submittedAnswer.trim()
         if (trimmedAnswer.isBlank()) {
             _uiState.update { it.copy(feedbackMessage = "Please enter a candidate solution before submitting.") }
             return
         }
 
-        val question = _uiState.value.currentQuestion ?: return
+        // Strict 0..99 integer validation for Objective questions
+        if (question.resolvedType == QuestionType.OBJECTIVE) {
+            val intVal = trimmedAnswer.toIntOrNull()
+            if (intVal == null || intVal !in 0..99) {
+                _uiState.update { it.copy(feedbackMessage = "Answer must be strictly an integer between 0 and 99.") }
+                return
+            }
+        }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isEvaluatingAnswer = true, feedbackMessage = null, errorMessage = null) }
             try {
-                val (isCorrect, eloResult) = matchmakingRepository.submitAnswer(question, trimmedAnswer)
+                // Route to AI Tutor semantic evaluation if question is Subjective Short Answer
+                val semanticCorrect = if (question.resolvedType == QuestionType.SUBJECTIVE_SHORT) {
+                    aiTutorRepository.evaluateSubjectiveAnswer(question, trimmedAnswer).getOrNull()
+                } else null
+
+                val (isCorrect, eloResult) = matchmakingRepository.submitAnswer(
+                    question = question,
+                    submittedAnswer = trimmedAnswer,
+                    isSemanticCorrect = semanticCorrect
+                )
 
                 if (isCorrect) {
                     _uiState.update { current ->

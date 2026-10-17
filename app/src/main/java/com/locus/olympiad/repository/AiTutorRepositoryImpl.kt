@@ -18,7 +18,6 @@ class AiTutorRepositoryImpl(
         userElo: Int,
         incorrectAttempts: List<String>
     ): Result<String> = withContext(Dispatchers.IO) {
-        // Construct the prompt using the required prompt template
         val prompt = AiTutorPromptBuilder.buildPrompt(
             userElo = userElo,
             category = question.category,
@@ -31,7 +30,7 @@ class AiTutorRepositoryImpl(
                 messages = listOf(
                     ChatMessage(
                         role = "system",
-                        content = "You are Euler, an elite International Math Olympiad coach. Always adhere strictly to the one-sentence conceptual hint rule."
+                        content = "You are Locus, an elite International Math Olympiad coach. Always adhere strictly to the one-sentence conceptual hint rule."
                     ),
                     ChatMessage(
                         role = "user",
@@ -48,12 +47,84 @@ class AiTutorRepositoryImpl(
                 }
             }
 
-            // Fallback stepping stone if API call was unsuccessful or unauthenticated
             Result.success(generateOfflineSteppingStone(question, incorrectAttempts))
         } catch (e: Exception) {
-            // Graceful pedagogical fallback when offline
             Result.success(generateOfflineSteppingStone(question, incorrectAttempts))
         }
+    }
+
+    override suspend fun evaluateSubjectiveAnswer(
+        question: PracticeQuestion,
+        candidateAnswer: String
+    ): Result<Boolean> = withContext(Dispatchers.IO) {
+        val trimmedCandidate = candidateAnswer.trim()
+        val trimmedCorrect = question.correctAnswer.trim()
+
+        // 1. Direct equivalence fast-path
+        if (trimmedCandidate.equals(trimmedCorrect, ignoreCase = true)) {
+            return@withContext Result.success(true)
+        }
+
+        // 2. Build prompt for LLM semantic evaluation
+        val evaluationPrompt = """
+            You are an elite International Mathematical Olympiad jury grader.
+            Task: Evaluate whether the student's candidate answer is mathematically and semantically EQUIVALENT to the official answer key.
+            
+            Olympiad Problem Statement:
+            ${question.latexContent}
+            
+            Official Canonical Answer:
+            $trimmedCorrect
+            
+            Student's Candidate Answer:
+            $trimmedCandidate
+            
+            Instructions:
+            - Focus strictly on semantic and mathematical correctness.
+            - Accept phrasing synonyms (e.g. "not possible", "impossible", "no solutions exist", "none").
+            - Accept equivalent algebraic expressions or unsimplified forms if mathematically identical.
+            - Output strictly ONE WORD: "CORRECT" or "INCORRECT".
+        """.trimIndent()
+
+        try {
+            val request = ChatCompletionRequest(
+                messages = listOf(
+                    ChatMessage(
+                        role = "system",
+                        content = "You are an expert Math Olympiad answer grader. Reply strictly with CORRECT or INCORRECT."
+                    ),
+                    ChatMessage(
+                        role = "user",
+                        content = evaluationPrompt
+                    )
+                )
+            )
+
+            val response = apiService.getChatCompletion(request)
+            if (response.isSuccessful) {
+                val verdict = response.body()?.choices?.firstOrNull()?.message?.content?.trim()?.uppercase()
+                if (verdict != null) {
+                    val isCorrect = verdict.contains("CORRECT") && !verdict.contains("INCORRECT")
+                    return@withContext Result.success(isCorrect)
+                }
+            }
+
+            Result.success(fallbackSemanticCheck(trimmedCorrect, trimmedCandidate))
+        } catch (e: Exception) {
+            Result.success(fallbackSemanticCheck(trimmedCorrect, trimmedCandidate))
+        }
+    }
+
+    private fun fallbackSemanticCheck(correct: String, candidate: String): Boolean {
+        val normCorrect = correct.lowercase().replace("[^a-z0-9]".toRegex(), "")
+        val normCandidate = candidate.lowercase().replace("[^a-z0-9]".toRegex(), "")
+        if (normCorrect == normCandidate) return true
+
+        val impossibilityPhrases = setOf("impossible", "notpossible", "nosolution", "nosolutions", "none", "empty")
+        if (normCorrect in impossibilityPhrases && normCandidate in impossibilityPhrases) {
+            return true
+        }
+        return false
     }
 
     /**

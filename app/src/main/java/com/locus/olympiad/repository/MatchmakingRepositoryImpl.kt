@@ -63,14 +63,50 @@ class MatchmakingRepositoryImpl(
 
     override suspend fun submitAnswer(
         question: PracticeQuestion,
-        submittedAnswer: String
+        submittedAnswer: String,
+        isSemanticCorrect: Boolean?
     ): Pair<Boolean, EloCalculationResult> = withContext(Dispatchers.IO) {
         val categoryName = question.category
-        val isCorrect = isAnswerCorrect(question.correctAnswer, submittedAnswer)
 
         // Fetch current user Elo
         val currentProfile = profileDao.getProfileByCategorySync(categoryName)
         val currentElo = currentProfile?.eloRating ?: UserTopicProfile.DEFAULT_ELO
+
+        // Subjective Proof questions: Neutral Elo (strictly 0 delta)
+        if (question.resolvedType == com.locus.olympiad.data.model.QuestionType.SUBJECTIVE_PROOF) {
+            val isUserValidated = submittedAnswer.equals("PROVED", ignoreCase = true) ||
+                    submittedAnswer.equals("SOLVED", ignoreCase = true) ||
+                    submittedAnswer.equals("VALID", ignoreCase = true)
+            val solvedIncrement = if (isUserValidated) 1 else 0
+
+            if (currentProfile == null) {
+                profileDao.insertOrUpdateProfile(
+                    UserTopicProfile(
+                        category = categoryName,
+                        eloRating = currentElo,
+                        questionsSolved = solvedIncrement,
+                        questionsAttempted = 1
+                    )
+                )
+            } else {
+                profileDao.recordSubmissionResult(
+                    category = categoryName,
+                    newElo = currentElo,
+                    solvedIncrement = solvedIncrement
+                )
+            }
+
+            return@withContext Pair(
+                isUserValidated,
+                EloCalculationResult(oldElo = currentElo, newElo = currentElo, delta = 0)
+            )
+        }
+
+        val isCorrect = if (question.resolvedType == com.locus.olympiad.data.model.QuestionType.SUBJECTIVE_SHORT && isSemanticCorrect != null) {
+            isSemanticCorrect
+        } else {
+            isAnswerCorrect(question.correctAnswer, submittedAnswer)
+        }
 
         // Compute new Elo with standard logistic equation
         val eloResult = EloCalculator.calculateNewRating(

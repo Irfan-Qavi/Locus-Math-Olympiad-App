@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
         PracticeQuestion::class,
         TheoryModule::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(RoomConverters::class)
@@ -45,6 +45,7 @@ abstract class LocusDatabase : RoomDatabase() {
                     LocusDatabase::class.java,
                     "locus_olympiad.db"
                 )
+                .fallbackToDestructiveMigration()
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)

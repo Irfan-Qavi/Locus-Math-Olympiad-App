@@ -50,6 +50,7 @@ object DatabaseInitializer {
             PracticeQuestion(
                 category = "Combinatorics",
                 difficultyElo = 1000,
+                questionType = "OBJECTIVE",
                 latexContent = """Let ${'$'}G = (V, E)${'$'} be a connected simple graph with ${'$'}n \ge 4${'$'} vertices. Suppose for every partition ${'$'}V = A \cup B${'$'} of the vertex set into non-empty disjoint subsets, the number of crossing edges satisfies:
 ${'$'}${'$'}e(A, B) \ge \left\lceil \frac{|A| \cdot |B|}{n - 1} \right\rceil + \sum_{v \in A} \operatorname{deg}(v) \pmod 2${'$'}${'$'}
 Determine the minimum possible chromatic number ${'$'}\chi(G)${'$'} across all such graphs.""",
@@ -59,12 +60,13 @@ Determine the minimum possible chromatic number ${'$'}\chi(G)${'$'} across all s
                     """If ${'$'}\chi(G) = 2${'$'}, then ${'$'}G${'$'} is bipartite. Partition ${'$'}V${'$'} into the two color classes and check whether the parity constraint can hold for all cuts.""",
                     """Notice that a cycle ${'$'}C_5${'$'} or ${'$'}K_3${'$'} requires at least 3 colors. Test if ${'$'}\chi(G)=3${'$'} satisfies the lower bound by constructing an admissible 3-chromatic triangulation."""
                 ),
-                sourceContest = "International Olympiad Training • Tier III",
+                source = "International Olympiad Training • Tier III",
                 tier = "Tier III"
             ),
             PracticeQuestion(
                 category = "Combinatorics",
                 difficultyElo = 1080,
+                questionType = "OBJECTIVE",
                 latexContent = """Find the number of permutations ${'$'}\pi${'$'} of ${'$'}\{1, 2, \dots, 6\}${'$'} such that for all ${'$'}1 \le k \le 5${'$'}:
 ${'$'}${'$'}|\pi(k) - \pi(k+1)| \ne 1${'$'}${'$'}""",
                 correctAnswer = "90",
@@ -73,12 +75,13 @@ ${'$'}${'$'}|\pi(k) - \pi(k+1)| \ne 1${'$'}${'$'}""",
                     """Let ${'$'}A_i${'$'} be the property that ${'$'}|\pi(i) - \pi(i+1)| = 1${'$'}. Count the intersections by grouping adjacent pairs into blocks.""",
                     """Evaluate ${'$'}\sum_{k=0}^5 (-1)^k N(k)${'$'} using the number of ways to place ${'$'}k${'$'} disjoint domino tiles."""
                 ),
-                sourceContest = "IOQM Final Stage",
+                source = "IOQM Final Stage",
                 tier = "Tier II"
             ),
             PracticeQuestion(
                 category = "Algebra",
                 difficultyElo = 1020,
+                questionType = "OBJECTIVE",
                 latexContent = """Find all real solutions ${'$'}(x, y)${'$'} to the symmetric system of equations:
 ${'$'}${'$'}\begin{cases} x^3 - y^3 = 7 \\ x^2 y - x y^2 = 2 \end{cases}${'$'}${'$'}
 What is the maximum value of ${'$'}x + y${'$'}?""",
@@ -88,26 +91,48 @@ What is the maximum value of ${'$'}x + y${'$'}?""",
                     """Compute ${'$'}(x - y)^3 = (x^3 - y^3) - 3(x^2y - xy^2) = 7 - 3(2) = 1${'$'}. Thus ${'$'}x - y = 1${'$'}.""",
                     """Substitute ${'$'}x = y + 1${'$'} into ${'$'}xy(x - y) = 2${'$'} to find ${'$'}y(y + 1) = 2${'$'}, giving roots ${'$'}y = 1${'$'} or ${'$'}y = -2${'$'}."""
                 ),
-                sourceContest = "RMO Algebra Round",
+                source = "RMO Algebra Round",
                 tier = "Tier II"
             ),
             PracticeQuestion(
                 category = "Algebra",
                 difficultyElo = 1140,
+                questionType = "SUBJECTIVE_SHORT",
                 latexContent = """Let ${'$'}P(x)${'$'} be a polynomial with integer coefficients such that ${'$'}P(1) = 2024${'$'} and ${'$'}P(2024) = 1${'$'}. 
-If ${'$'}P(k) = k${'$'} for some integer ${'$'}k${'$'}, find the value of ${'$'}k${'$'}.""",
+If ${'$'}P(k) = k${'$'} for some integer ${'$'}k${'$'}, find the value of ${'$'}k${'$'} (Enter 'No solution' if none exists).""",
                 correctAnswer = "No solution",
                 listOfHints = listOf(
                     """Recall the fundamental integer polynomial divisibility property: ${'$'}(a - b) \mid (P(a) - P(b))${'$'} for distinct integers ${'$'}a, b${'$'}.""",
                     """Apply this property to pairs ${'$'}(k, 1)${'$'} and ${'$'}(k, 2024)${'$'}.""",
                     """Analyze whether ${'$'}(k - 1) \mid (k - 2024)${'$'} and ${'$'}(k - 2024) \mid (k - 1)${'$'} can both hold simultaneously."""
                 ),
-                sourceContest = "IOQM National Camp",
+                source = "IOQM National Camp",
                 tier = "Tier III"
+            ),
+            PracticeQuestion(
+                category = "Algebra",
+                difficultyElo = 1450,
+                questionType = "SUBJECTIVE_PROOF",
+                latexContent = """Prove that for all positive real numbers ${'$'}a, b, c${'$'}:
+${'$'}${'$'}\frac{a}{b + c} + \frac{b}{c + a} + \frac{c}{a + b} \ge \frac{3}{2}${'$'}${'$'}""",
+                correctAnswer = "Nesbitt Inequality holds by Cauchy-Schwarz",
+                proofSolution = """By Cauchy-Schwarz in Engel form (Sedrakyan lemma):
+${'$'}${'$'}\sum_{cyc} \frac{a}{b+c} = \sum_{cyc} \frac{a^2}{ab + ac} \ge \frac{(a+b+c)^2}{2(ab+bc+ca)}${'$'}${'$'}
+Since ${'$'}(a+b+c)^2 \ge 3(ab+bc+ca)${'$'}, we have:
+${'$'}${'$'}\frac{(a+b+c)^2}{2(ab+bc+ca)} \ge \frac{3}{2}${'$'}${'$'}
+Equality holds if and only if ${'$'}a = b = c${'$'}.""",
+                listOfHints = listOf(
+                    """Consider rewriting each term by adding 1: ${'$'}\frac{a}{b+c} + 1 = \frac{a+b+c}{b+c}${'$'}.""",
+                    """Apply Cauchy-Schwarz inequality or AM-HM inequality to ${'$'}\sum \frac{1}{b+c}${'$'}.""",
+                    """Alternatively, apply Sedrakyan's lemma (Cauchy-Schwarz in Engel form)."""
+                ),
+                source = "Nesbitt's Classical Lemma • Tier II",
+                tier = "Tier II"
             ),
             PracticeQuestion(
                 category = "Number Theory",
                 difficultyElo = 990,
+                questionType = "OBJECTIVE",
                 latexContent = """Find the remainder when ${'$'}2^{2026} + 3^{2026}${'$'} is divided by ${'$'}13${'$'}.""",
                 correctAnswer = "0",
                 listOfHints = listOf(
@@ -115,12 +140,13 @@ If ${'$'}P(k) = k${'$'} for some integer ${'$'}k${'$'}, find the value of ${'$'}
                     """Reduce the exponent ${'$'}2026${'$'} modulo ${'$'}12${'$'}: ${'$'}2026 = 12 \times 168 + 10${'$'}.""",
                     """Calculate ${'$'}2^{10} \pmod{13}${'$'} and ${'$'}3^{10} \pmod{13}${'$'} and sum them up modulo 13."""
                 ),
-                sourceContest = "IOQM Prelims",
+                source = "IOQM Prelims",
                 tier = "Tier I"
             ),
             PracticeQuestion(
                 category = "Number Theory",
                 difficultyElo = 1050,
+                questionType = "OBJECTIVE",
                 latexContent = """Find all pairs of primes ${'$'}(p, q)${'$'} such that:
 ${'$'}${'$'}p^2 - 2q^2 = 1${'$'}${'$'}
 What is the sum ${'$'}p + q${'$'}?""",
@@ -130,12 +156,13 @@ What is the sum ${'$'}p + q${'$'}?""",
                     """Consider the parity of ${'$'}p${'$'}. If ${'$'}p=2${'$'}, ${'$'}4 - 2q^2 = 1${'$'} has no prime solution. Thus ${'$'}p${'$'} must be odd.""",
                     """Since ${'$'}p${'$'} is odd, both ${'$'}p - 1${'$'} and ${'$'}p + 1${'$'} are consecutive even integers. Analyze the distribution of factors of ${'$'}2q^2${'$'} to deduce ${'$'}q = 2${'$'} and ${'$'}p = 3${'$'}."""
                 ),
-                sourceContest = "RMO Number Theory",
+                source = "RMO Number Theory",
                 tier = "Tier II"
             ),
             PracticeQuestion(
                 category = "Geometry",
                 difficultyElo = 1010,
+                questionType = "OBJECTIVE",
                 latexContent = """In acute triangle ${'$'}\triangle ABC${'$'}, let ${'$'}H${'$'} be the orthocenter and ${'$'}O${'$'} the circumcenter. If ${'$'}\angle A = 60^\circ${'$'} and ${'$'}BC = 12${'$'}, compute the length of the segment ${'$'}OH${'$'}.""",
                 correctAnswer = "12",
                 listOfHints = listOf(
@@ -143,12 +170,13 @@ What is the sum ${'$'}p + q${'$'}?""",
                     """For ${'$'}\angle A = 60^\circ${'$'}, ${'$'}\cos 60^\circ = 1/2${'$'}, so ${'$'}AH = R${'$'}.""",
                     """Notice that in quadrilateral ${'$'}AHCO${'$'} or by the distance formula ${'$'}OH^2 = 9R^2 - (a^2+b^2+c^2)${'$'}, what is ${'$'}R${'$'} when ${'$'}a=12${'$'} and ${'$'}\angle A=60^\circ${'$'}? ${'$'}a = 2R \sin 60^\circ${'$'}, giving ${'$'}R = 4\sqrt{3}${'$'}."""
                 ),
-                sourceContest = "RMO Geometry",
+                source = "RMO Geometry",
                 tier = "Tier II"
             ),
             PracticeQuestion(
                 category = "Geometry",
                 difficultyElo = 1130,
+                questionType = "SUBJECTIVE_SHORT",
                 latexContent = """Let ${'$'}\Gamma${'$'} be the incircle of ${'$'}\triangle ABC${'$'} tangent to ${'$'}BC, CA, AB${'$'} at ${'$'}D, E, F${'$'} respectively. If ${'$'}AB = 13${'$'}, ${'$'}BC = 14${'$'}, ${'$'}CA = 15${'$'}, compute the area of ${'$'}\triangle DEF${'$'}.""",
                 correctAnswer = "84/5",
                 listOfHints = listOf(
@@ -156,7 +184,7 @@ What is the sum ${'$'}p + q${'$'}?""",
                     """Use contact triangle properties: ${'$'}AE = AF = s - a = 7${'$'}, ${'$'}BD = BF = s - b = 8${'$'}, ${'$'}CD = CE = s - c = 6${'$'}.""",
                     """Express Area(${'$'}\triangle DEF${'$'}) in terms of ${'$'}\triangle ABC${'$'} by subtracting the outer vertex triangles or using the formula ${'$'}\frac{r \cdot \text{Area}(\triangle ABC)}{2R}${'$'}."""
                 ),
-                sourceContest = "IOQM National Level",
+                source = "IOQM National Level",
                 tier = "Tier III"
             )
         )

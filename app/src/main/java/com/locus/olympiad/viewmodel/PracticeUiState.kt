@@ -31,7 +31,8 @@ data class PracticeUiState(
     val lastEloDelta: Int? = null,
     val userDraftAnswer: String = "",
     val feedbackMessage: String? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isProofSolutionRevealed: Boolean = false
 ) {
     val totalHintsCount: Int
         get() = currentQuestion?.listOfHints?.size ?: 0

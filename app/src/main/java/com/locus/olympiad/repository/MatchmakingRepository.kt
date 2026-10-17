@@ -40,7 +40,8 @@ interface MatchmakingRepository {
      */
     suspend fun submitAnswer(
         question: PracticeQuestion,
-        submittedAnswer: String
+        submittedAnswer: String,
+        isSemanticCorrect: Boolean? = null
     ): Pair<Boolean, EloCalculationResult>
 
     /**
