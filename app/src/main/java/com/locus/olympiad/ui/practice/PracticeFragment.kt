@@ -19,6 +19,7 @@ import com.locus.olympiad.data.model.MathTopic
 import com.locus.olympiad.data.model.PracticeSessionConfig
 import com.locus.olympiad.data.model.QuestionType
 import com.locus.olympiad.databinding.ActivityPracticeBinding
+import com.locus.olympiad.ui.main.MainActivity
 import com.locus.olympiad.viewmodel.PracticeUiState
 import com.locus.olympiad.viewmodel.PracticeViewModel
 import dagger.hilt.android.AndroidEntryPoint
