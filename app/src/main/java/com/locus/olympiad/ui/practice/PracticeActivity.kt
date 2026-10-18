@@ -216,7 +216,7 @@ class PracticeActivity : AppCompatActivity() {
                         binding.cardRevealedAnswer.isVisible = false
                         binding.tvAnswerFormatNote.isVisible = true
                         binding.tvAnswerFormatNote.text = "Semantic AI evaluation enabled. Phrasing variations accepted."
-                        binding.etAnswer.inputType = InputType.TYPE_CLASS_TEXT
+                        binding.etAnswer.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
                         binding.containerQuickKeys.isVisible = false
                     }
                 }

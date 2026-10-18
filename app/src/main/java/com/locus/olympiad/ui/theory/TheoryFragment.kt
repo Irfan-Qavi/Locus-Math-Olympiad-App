@@ -51,13 +51,15 @@ class TheoryFragment : Fragment() {
 
     private fun setupUnitTabs() {
         binding.chipGroupUnits.setOnCheckedStateChangeListener { _, checkedIds ->
-            val category = when (checkedIds.firstOrNull()) {
+            val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
+            val category = when (checkedId) {
                 R.id.chipUnitAlgebra -> "Algebra"
                 R.id.chipUnitNumberTheory -> "Number Theory"
                 R.id.chipUnitGeometry -> "Geometry"
+                R.id.chipUnitCombinatorics -> "Combinatorics"
                 else -> "Combinatorics"
             }
-            viewModel.loadCategory(category)
+            viewModel.loadTheory(category)
         }
     }
 
@@ -68,9 +70,10 @@ class TheoryFragment : Fragment() {
                 var lastRenderedModuleId: Long? = null
 
                 viewModel.uiState.collect { state ->
-                    // Rebuild chips only when the category or module list changes
+                    // Rebuild chips when the category changes or when modules update
                     if (lastRenderedCategory != state.category) {
                         lastRenderedCategory = state.category
+                        lastRenderedModuleId = null
                         populateLemmaChips(state.modules, state.selectedModule)
                     }
 

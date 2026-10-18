@@ -56,7 +56,7 @@
                 android:id="@+id/etUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"
+                android:inputType="text|textCapSentences"
                 android:maxLines="1"
                 android:textColor="@color/on_surface"
                 android:text="Gauss" />

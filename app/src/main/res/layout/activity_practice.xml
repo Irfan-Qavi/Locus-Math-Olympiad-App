@@ -228,7 +228,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="serif"
                         android:imeOptions="actionDone"
-                        android:inputType="text"
+                        android:inputType="text|textCapSentences"
                         android:maxLines="1"
                         android:textColor="@color/primary"
                         android:textSize="18sp" />

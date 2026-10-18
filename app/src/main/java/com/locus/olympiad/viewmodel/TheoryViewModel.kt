@@ -27,20 +27,33 @@ class TheoryViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TheoryUiState(isLoading = true))
     val uiState: StateFlow<TheoryUiState> = _uiState.asStateFlow()
 
+    private var fetchJob: kotlinx.coroutines.Job? = null
+
     init {
         loadCategory("Combinatorics")
     }
 
+    fun loadTheory(unit: String) {
+        loadCategory(unit)
+    }
+
     fun loadCategory(category: String) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(category = category, isLoading = true, isReady = false)
+        fetchJob?.cancel()
+        fetchJob = viewModelScope.launch {
+            _uiState.value = TheoryUiState(
+                category = category,
+                modules = emptyList(),
+                selectedModule = null,
+                isLoading = true,
+                isReady = false
+            )
             val modules = theoryModuleDao.getModulesByCategorySync(category)
             val initialModule = modules.firstOrNull()
             val ready = initialModule != null &&
                     initialModule.latexContent.isNotBlank() &&
                     !initialModule.heuristicsAndTricks.isNullOrBlank()
 
-            _uiState.value = _uiState.value.copy(
+            _uiState.value = TheoryUiState(
                 category = category,
                 modules = modules,
                 selectedModule = initialModule,

@@ -35,13 +35,15 @@ class TheoryActivity : AppCompatActivity() {
 
     private fun setupUnitTabs() {
         binding.chipGroupUnits.setOnCheckedStateChangeListener { _, checkedIds ->
-            val category = when (checkedIds.firstOrNull()) {
+            val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
+            val category = when (checkedId) {
                 R.id.chipUnitAlgebra -> "Algebra"
                 R.id.chipUnitNumberTheory -> "Number Theory"
                 R.id.chipUnitGeometry -> "Geometry"
+                R.id.chipUnitCombinatorics -> "Combinatorics"
                 else -> "Combinatorics"
             }
-            viewModel.loadCategory(category)
+            viewModel.loadTheory(category)
         }
     }
 
@@ -54,6 +56,7 @@ class TheoryActivity : AppCompatActivity() {
                 viewModel.uiState.collect { state ->
                     if (lastRenderedCategory != state.category) {
                         lastRenderedCategory = state.category
+                        lastRenderedModuleId = null
                         populateLemmaChips(state.modules, state.selectedModule)
                     }
 
