@@ -281,14 +281,23 @@ class KatexWebView @JvmOverloads constructor(
 <body>
     <div id="content">{LATEX_CONTENT_PLACEHOLDER}</div>
     <script>
-        var heightSent = false;
-        function sendHeightOnce() {
-            if (heightSent) return;
-            heightSent = true;
+        var lastSentHeight = 0;
+        function updateAndSendHeight() {
             document.body.style.opacity = "1";
-            var height = document.body.scrollHeight || document.documentElement.scrollHeight || 0;
-            if (window.Android && window.Android.setHeight) {
-                window.Android.setHeight(height);
+            var contentEl = document.getElementById("content");
+            var height = 0;
+            if (contentEl) {
+                var rect = contentEl.getBoundingClientRect();
+                height = Math.ceil(rect.height || contentEl.offsetHeight || contentEl.scrollHeight || 0);
+            }
+            if (!height || height === 0) {
+                height = Math.ceil(document.body.offsetHeight || document.documentElement.offsetHeight || 0);
+            }
+            if (height > 0 && Math.abs(height - lastSentHeight) > 3) {
+                lastSentHeight = height;
+                if (window.Android && window.Android.setHeight) {
+                    window.Android.setHeight(height);
+                }
             }
         }
 
@@ -320,21 +329,30 @@ class KatexWebView @JvmOverloads constructor(
                 console.error("KaTeX render error:", e);
             }
 
-            if (document.fonts && document.fonts.ready) {
-                document.fonts.ready.then(function() {
-                    sendHeightOnce();
-                }).catch(function() {
-                    sendHeightOnce();
+            var contentEl = document.getElementById("content");
+            if (window.ResizeObserver && contentEl) {
+                var ro = new ResizeObserver(function() {
+                    updateAndSendHeight();
                 });
-            } else {
-                sendHeightOnce();
+                ro.observe(contentEl);
             }
 
-            setTimeout(sendHeightOnce, 350);
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(function() {
+                    updateAndSendHeight();
+                }).catch(function() {
+                    updateAndSendHeight();
+                });
+            } else {
+                updateAndSendHeight();
+            }
+
+            setTimeout(updateAndSendHeight, 200);
+            setTimeout(updateAndSendHeight, 500);
         });
 
         window.addEventListener("load", function() {
-            sendHeightOnce();
+            updateAndSendHeight();
         });
     </script>
 </body>

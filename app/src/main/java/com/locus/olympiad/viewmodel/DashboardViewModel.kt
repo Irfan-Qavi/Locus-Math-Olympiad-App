@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -16,6 +17,14 @@ class DashboardViewModel @Inject constructor(
     private val matchmakingRepository: MatchmakingRepository,
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
+
+    val totalSolvedCount: StateFlow<Int> = matchmakingRepository.getAllUserProfiles()
+        .map { profiles -> profiles.sumOf { it.questionsSolved } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0
+        )
 
     val uiState: StateFlow<DashboardUiState> = combine(
         matchmakingRepository.getAllUserProfiles(),

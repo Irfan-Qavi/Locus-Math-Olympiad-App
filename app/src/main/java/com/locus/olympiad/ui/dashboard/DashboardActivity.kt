@@ -81,6 +81,7 @@ class DashboardActivity : AppCompatActivity() {
                     binding.tvUserInitial.text = state.userInitial
                     binding.tvGreeting.text = "Welcome, ${state.userName}"
                     binding.tvUserRank.text = state.rankTitle
+                    binding.tvSolvedCount.text = "${state.solvedCount} Solved"
 
                     binding.tvCombinatoricsElo.text = "${state.combinatoricsElo} Elo"
                     binding.tvAlgebraElo.text = "${state.algebraElo} Elo"

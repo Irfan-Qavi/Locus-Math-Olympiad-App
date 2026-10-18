@@ -69,11 +69,11 @@ class PracticeFragment : Fragment() {
 
     private fun setupListeners() {
         binding.btnBack.setOnClickListener {
-            showEndPracticeDialog()
+            showEndPracticeDialog { navigateBack() }
         }
 
         binding.btnEndPractice.setOnClickListener {
-            showEndPracticeDialog()
+            showEndPracticeDialog { navigateBack() }
         }
 
         binding.btnSubmitAnswer.setOnClickListener {
@@ -133,18 +133,28 @@ class PracticeFragment : Fragment() {
         }
     }
 
-    private fun showEndPracticeDialog() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("End Practice Session?")
-            .setMessage("Are you sure you want to end this practice session? Your progress will be concluded with 0 penalty.")
-            .setPositiveButton("End Practice") { dialog, _ ->
-                dialog.dismiss()
-                viewModel.endPractice()
-            }
-            .setNegativeButton("Continue Practicing") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+    fun endPracticeFromHost() {
+        viewModel.endPractice()
+    }
+
+    private fun showEndPracticeDialog(pendingNavigation: (() -> Unit)? = null) {
+        val host = activity as? MainActivity
+        if (host != null) {
+            host.showEndPracticeDialog(pendingNavigation)
+        } else {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("End Practice Session?")
+                .setMessage("Are you sure you want to end this practice session? Your progress will be concluded with 0 penalty.")
+                .setPositiveButton("End Practice") { dialog, _ ->
+                    dialog.dismiss()
+                    viewModel.endPractice()
+                    pendingNavigation?.invoke()
+                }
+                .setNegativeButton("Continue Practicing") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
     }
 
     private fun navigateBack() {

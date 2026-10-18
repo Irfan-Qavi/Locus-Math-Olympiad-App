@@ -29,6 +29,9 @@ class DashboardFragment : Fragment() {
 
     private val viewModel: DashboardViewModel by viewModels()
 
+    @javax.inject.Inject
+    lateinit var userPreferencesRepository: com.locus.olympiad.data.UserPreferencesRepository
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,7 +62,7 @@ class DashboardFragment : Fragment() {
 
     private fun setupListeners() {
         binding.btnStartPractice.setOnClickListener {
-            openPracticeConfig(null)
+            handleStartPractice(null)
         }
 
         binding.btnOpenTheory.setOnClickListener {
@@ -70,10 +73,36 @@ class DashboardFragment : Fragment() {
             findNavController().navigate(R.id.nav_theory, null, navOptions)
         }
 
-        binding.cardCombinatorics.setOnClickListener { openPracticeConfig(MathTopic.COMBINATORICS) }
-        binding.cardAlgebra.setOnClickListener { openPracticeConfig(MathTopic.ALGEBRA) }
-        binding.cardNumberTheory.setOnClickListener { openPracticeConfig(MathTopic.NUMBER_THEORY) }
-        binding.cardGeometry.setOnClickListener { openPracticeConfig(MathTopic.GEOMETRY) }
+        binding.cardCombinatorics.setOnClickListener { handleStartPractice(MathTopic.COMBINATORICS) }
+        binding.cardAlgebra.setOnClickListener { handleStartPractice(MathTopic.ALGEBRA) }
+        binding.cardNumberTheory.setOnClickListener { handleStartPractice(MathTopic.NUMBER_THEORY) }
+        binding.cardGeometry.setOnClickListener { handleStartPractice(MathTopic.GEOMETRY) }
+    }
+
+    private fun handleStartPractice(topic: MathTopic?) {
+        if (userPreferencesRepository.hasActiveSession()) {
+            val host = activity as? com.locus.olympiad.ui.main.MainActivity
+            if (host != null) {
+                host.showActiveSessionPrompt(
+                    onContinue = {
+                        val bundle = bundleOf("resume_session" to true)
+                        val navOptions = androidx.navigation.NavOptions.Builder()
+                            .setLaunchSingleTop(true)
+                            .setPopUpTo(R.id.nav_dashboard, inclusive = false)
+                            .build()
+                        findNavController().navigate(R.id.nav_practice, bundle, navOptions)
+                    },
+                    onStop = {
+                        userPreferencesRepository.clearActiveSession()
+                        openPracticeConfig(topic)
+                    }
+                )
+            } else {
+                openPracticeConfig(topic)
+            }
+        } else {
+            openPracticeConfig(topic)
+        }
     }
 
     private fun openPracticeConfig(topic: MathTopic?) {
@@ -101,6 +130,7 @@ class DashboardFragment : Fragment() {
                     binding.tvUserInitial.text = state.userInitial
                     binding.tvGreeting.text = "Welcome, ${state.userName}"
                     binding.tvUserRank.text = state.rankTitle
+                    binding.tvSolvedCount.text = "${state.solvedCount} Solved"
 
                     binding.tvCombinatoricsElo.text = "${state.combinatoricsElo} Elo"
                     binding.tvAlgebraElo.text = "${state.algebraElo} Elo"

@@ -115,13 +115,14 @@ class PracticeActivity : AppCompatActivity() {
         }
     }
 
-    private fun showEndPracticeDialog() {
+    private fun showEndPracticeDialog(pendingNavigation: (() -> Unit)? = null) {
         MaterialAlertDialogBuilder(this)
             .setTitle("End Practice Session?")
             .setMessage("Are you sure you want to end this practice session? Your progress will be concluded with 0 penalty.")
             .setPositiveButton("End Practice") { dialog, _ ->
                 dialog.dismiss()
                 viewModel.endPractice()
+                pendingNavigation?.invoke() ?: finish()
             }
             .setNegativeButton("Continue Practicing") { dialog, _ ->
                 dialog.dismiss()

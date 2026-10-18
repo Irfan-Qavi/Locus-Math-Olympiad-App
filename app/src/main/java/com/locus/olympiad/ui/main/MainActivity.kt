@@ -63,15 +63,9 @@ class MainActivity : AppCompatActivity() {
 
             // 2. Navigating away from Practice while session is active
             if (currentDestId == R.id.nav_practice && hasActivePractice) {
-                showActiveSessionPrompt(
-                    onContinue = {
-                        // User chose to continue practicing -> do not navigate away
-                    },
-                    onStop = {
-                        userPreferencesRepository.clearActiveSession()
-                        performTabNavigation(item.itemId)
-                    }
-                )
+                showEndPracticeDialog(pendingNavigation = {
+                    performTabNavigation(item.itemId)
+                })
                 return@setOnItemSelectedListener false
             }
 
@@ -131,7 +125,29 @@ class MainActivity : AppCompatActivity() {
         navController.navigate(R.id.nav_practice, bundle, navOptions)
     }
 
-    private fun showActiveSessionPrompt(onContinue: () -> Unit, onStop: () -> Unit) {
+    fun showEndPracticeDialog(pendingNavigation: (() -> Unit)? = null) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("End Practice Session?")
+            .setMessage("Are you sure you want to end this practice session? Your progress will be concluded with 0 penalty.")
+            .setPositiveButton("End Practice") { dialog, _ ->
+                dialog.dismiss()
+                userPreferencesRepository.clearActiveSession()
+                val currentDestId = navController.currentDestination?.id
+                if (currentDestId == R.id.nav_practice) {
+                    val practiceFrag = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+                        ?.childFragmentManager?.fragments?.firstOrNull { it is PracticeFragment } as? PracticeFragment
+                    practiceFrag?.endPracticeFromHost()
+                }
+                pendingNavigation?.invoke()
+            }
+            .setNegativeButton("Continue Practicing") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    fun showActiveSessionPrompt(onContinue: () -> Unit, onStop: () -> Unit) {
         MaterialAlertDialogBuilder(this)
             .setTitle("A practice session is active")
             .setMessage("You have an active Olympiad practice session in progress. Would you like to continue practicing or stop the session?")

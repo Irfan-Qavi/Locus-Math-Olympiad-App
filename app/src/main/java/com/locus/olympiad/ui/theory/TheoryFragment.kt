@@ -6,18 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import com.locus.olympiad.R
-import com.locus.olympiad.data.dao.TheoryModuleDao
 import com.locus.olympiad.data.model.TheoryModule
 import com.locus.olympiad.databinding.ActivityTheoryBinding
+import com.locus.olympiad.viewmodel.TheoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class TheoryFragment : Fragment() {
@@ -25,10 +25,7 @@ class TheoryFragment : Fragment() {
     private var _binding: ActivityTheoryBinding? = null
     private val binding get() = _binding!!
 
-    @Inject
-    lateinit var theoryModuleDao: TheoryModuleDao
-
-    private var currentModules: List<TheoryModule> = emptyList()
+    private val viewModel: TheoryViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,7 +46,7 @@ class TheoryFragment : Fragment() {
         }
 
         setupUnitTabs()
-        loadCategoryTheory("Combinatorics")
+        observeState()
     }
 
     private fun setupUnitTabs() {
@@ -60,42 +57,52 @@ class TheoryFragment : Fragment() {
                 R.id.chipUnitGeometry -> "Geometry"
                 else -> "Combinatorics"
             }
-            loadCategoryTheory(category)
+            viewModel.loadCategory(category)
         }
     }
 
-    private fun loadCategoryTheory(category: String) {
+    private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val modules = withContext(Dispatchers.IO) {
-                theoryModuleDao.getModulesByCategorySync(category)
-            }
-            currentModules = modules
-            if (_binding != null) {
-                populateLemmaChips(modules)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                var lastRenderedCategory: String? = null
+                var lastRenderedModuleId: Long? = null
+
+                viewModel.uiState.collect { state ->
+                    // Rebuild chips only when the category or module list changes
+                    if (lastRenderedCategory != state.category) {
+                        lastRenderedCategory = state.category
+                        populateLemmaChips(state.modules, state.selectedModule)
+                    }
+
+                    // Only trigger KaTeX rendering once combined state (Theory Text + Tips/Heuristics) is non-null & ready
+                    if (state.isReady && state.selectedModule != null) {
+                        if (lastRenderedModuleId != state.selectedModule.id) {
+                            lastRenderedModuleId = state.selectedModule.id
+                            renderModule(state.selectedModule)
+                        }
+                    }
+                }
             }
         }
     }
 
-    private fun populateLemmaChips(modules: List<TheoryModule>) {
+    private fun populateLemmaChips(modules: List<TheoryModule>, selected: TheoryModule?) {
         binding.chipGroupLemmas.removeAllViews()
         if (modules.isEmpty()) return
 
-        modules.forEachIndexed { index, module ->
+        modules.forEach { module ->
             val chip = Chip(requireContext()).apply {
                 text = module.title
                 isCheckable = true
                 id = View.generateViewId()
-                isChecked = index == 0
-                setOnClickListener { displayModule(module) }
+                isChecked = (selected != null && module.id == selected.id) || (selected == null && module == modules.first())
+                setOnClickListener { viewModel.selectModule(module) }
             }
             binding.chipGroupLemmas.addView(chip)
         }
-
-        val firstModule = modules.first()
-        displayModule(firstModule)
     }
 
-    private fun displayModule(module: TheoryModule) {
+    private fun renderModule(module: TheoryModule) {
         binding.tvTheoryTitle.text = module.title
         binding.tvChapterHeader.text = module.chapterName.uppercase()
         binding.webViewTheoryMath.setLatexContent(module.latexContent)
