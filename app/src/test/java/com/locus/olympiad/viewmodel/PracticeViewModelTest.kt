@@ -80,6 +80,7 @@ class PracticeViewModelTest {
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.lastSubmissionCorrect == true)
+        assertTrue(viewModel.uiState.value.isAnswerRevealed)
         assertEquals(1016, viewModel.uiState.value.userElo)
         assertEquals(1, viewModel.uiState.value.sessionSolvedCount)
         assertEquals(16, viewModel.uiState.value.sessionNetEloDelta)

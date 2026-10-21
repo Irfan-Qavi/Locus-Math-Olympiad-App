@@ -116,31 +116,9 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:id="@+id/tvProblemTag"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@color/primary_container"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="2dp"
-                            android:text="PROBLEM #1"
-                            android:textColor="@color/on_primary_container"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvProblemTier"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:text="Tier III"
-                            android:textColor="@color/on_surface_variant"
-                            android:textSize="11sp" />
-
-                        <TextView
                             android:id="@+id/tvSessionProgress"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
                             android:background="@drawable/badge_rounded_violet"
                             android:paddingHorizontal="6dp"
                             android:paddingVertical="2dp"
@@ -400,6 +378,14 @@
                         android:textColor="@color/on_surface"
                         android:textSize="18sp"
                         android:textStyle="bold" />
+
+                    <!-- Solution Breakdown KaTeX Display -->
+                    <com.locus.olympiad.ui.math.KatexWebView
+                        android:id="@+id/webViewRevealedMath"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/tvRevealedPenaltyNote"

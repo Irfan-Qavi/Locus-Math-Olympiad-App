@@ -335,6 +335,7 @@ class PracticeViewModel @Inject constructor(
                             sessionSolvedCount = current.sessionSolvedCount + 1,
                             sessionNetEloDelta = current.sessionNetEloDelta + eloResult.delta,
                             isEvaluatingAnswer = false,
+                            isAnswerRevealed = true,
                             feedbackMessage = if (isRiskFree) {
                                 "Correct! (Risk-Free Mode: 0 Elo delta)."
                             } else {

@@ -26,7 +26,21 @@ class AiTutorRepositoryImpl(
         }
 
         // 2. Build prompt for LLM semantic evaluation with strict JSON schema
-        val systemPrompt = "You are evaluating high school Olympiad mathematics. You must mark the student's answer as CORRECT if it is mathematically and semantically equivalent to the expected answer, regardless of phrasing. For example, 'Such a configuration does not exist', '0 solutions', 'None', and 'Impossible' are all strictly equivalent. Return strictly a JSON object: {\"isCorrect\": true} or {\"isCorrect\": false}."
+        val systemPrompt = """
+            You are an expert mathematical olympiad grading evaluator.
+            Your role is to determine whether the student's candidate answer is mathematically and semantically equivalent to the expected answer, regardless of notation, phrasing, or formatting differences.
+            
+            Strict Directives for Mathematical & Semantic Equivalence:
+            1. Numbers, Fractions, and Decimals: Fractions and decimals representing identical real values are strictly equivalent (e.g., "1/2", "0.5", "\frac{1}{2}", and "2^{-1}" are all equivalent).
+            2. Equation vs Value: Stating the variable equation vs the isolated value is equivalent (e.g., "x = 2", "x=2", "k = 2", or simply "2" are all equivalent).
+            3. Algebraic & LaTeX Formats: Differences in LaTeX markup, spacing, parentheses, multiplication symbols, or variable ordering must be evaluated for algebraic equivalence (e.g., "x(x+1)", "x^2+x", "x \cdot (x+1)", and "$x^2+x$" are all equivalent).
+            4. Impossibility & Existence: Synonymous statements for non-existence must be treated as equivalent (e.g., "No solution", "None", "Impossible", "0 solutions", "Empty set", "Such a configuration does not exist", and "\emptyset" are all strictly equivalent).
+            5. Case & Whitespace Insensitive: Ignore capitalization, surrounding whitespace, and LaTeX dollar signs ($...$ or $$...$$).
+            
+            Output Requirement:
+            Return STRICTLY a raw JSON object with no markdown fences, no explanatory text, and no backticks:
+            {"isCorrect": true} or {"isCorrect": false}
+        """.trimIndent()
 
         val evaluationPrompt = """
             Evaluate whether the student's candidate answer is mathematically and semantically equivalent to the official expected answer.
@@ -62,7 +76,11 @@ class AiTutorRepositoryImpl(
             if (response.isSuccessful) {
                 val rawBody = response.body()?.choices?.firstOrNull()?.message?.content?.trim()
                 if (!rawBody.isNullOrBlank()) {
-                    val jsonCandidate = rawBody.substringAfter("{", "").let {
+                    // Fallback regex to safely extract the JSON object even if wrapped in markdown blocks (```json ... ``` or ``` ...)
+                    val jsonRegex = Regex("""\{[\s\S]*?"isCorrect"\s*:\s*(true|false)[\s\S]*?\}""", RegexOption.IGNORE_CASE)
+                    val matchedJson = jsonRegex.find(rawBody)?.value
+
+                    val jsonCandidate = matchedJson ?: rawBody.substringAfter("{", "").let {
                         if (it.isNotEmpty()) "{" + it.substringBeforeLast("}", "") + "}" else rawBody
                     }
                     try {

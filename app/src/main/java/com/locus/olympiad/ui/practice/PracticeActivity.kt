@@ -28,6 +28,7 @@ class PracticeActivity : AppCompatActivity() {
 
     private var currentRenderedQuestionId: Long? = null
     private var currentRenderedProofId: Long? = null
+    private var currentRenderedRevealedId: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +84,10 @@ class PracticeActivity : AppCompatActivity() {
 
         binding.btnProofNext.setOnClickListener {
             viewModel.proceedToNextQuestion()
+        }
+
+        binding.overlayEvaluationResult.setOnClickListener {
+            viewModel.dismissEvaluationResult()
         }
 
         // Evaluation Result Modal Actions
@@ -152,9 +157,6 @@ class PracticeActivity : AppCompatActivity() {
 
         // Question Details & CMU Serif KaTeX WebView Rendering
         state.currentQuestion?.let { question ->
-            binding.tvProblemTag.text = "PROBLEM #${question.id}"
-            binding.tvProblemTier.text = question.tier
-
             // Question Type Badge
             val qType = question.resolvedType
             binding.tvQuestionTypeBadge.text = when (qType) {
@@ -181,16 +183,27 @@ class PracticeActivity : AppCompatActivity() {
                     if (state.isAnswerRevealed) {
                         binding.containerAnswerInput.isVisible = false
                         binding.cardRevealedAnswer.isVisible = true
-                        binding.tvRevealedAnswerValue.text = question.correctAnswer
+                        binding.tvRevealedAnswerValue.text = "Answer: ${question.correctAnswer}"
                         val delta = state.lastEloDelta ?: 0
-                        binding.tvRevealedPenaltyNote.text = if (state.sessionConfig.isRiskFree) {
-                            "Risk-Free Mode: 0 Elo penalty applied"
+                        binding.tvRevealedPenaltyNote.text = when {
+                            state.lastSubmissionCorrect == true -> "Correct! Verified solution."
+                            state.sessionConfig.isRiskFree -> "Risk-Free Mode: 0 Elo penalty applied"
+                            else -> "Penalty applied: $delta Elo"
+                        }
+                        val solutionText = if (!question.proofSolution.isNullOrBlank()) {
+                            question.proofSolution
                         } else {
-                            "Penalty applied: $delta Elo"
+                            "\\textbf{Official Solution:}\n\nThe correct answer is $$${question.correctAnswer}$$."
+                        }
+                        binding.webViewRevealedMath.isVisible = true
+                        if (currentRenderedRevealedId != question.id) {
+                            currentRenderedRevealedId = question.id
+                            binding.webViewRevealedMath.setLatexContent(solutionText)
                         }
                     } else {
                         binding.containerAnswerInput.isVisible = true
                         binding.cardRevealedAnswer.isVisible = false
+                        binding.webViewRevealedMath.isVisible = false
                         binding.tvAnswerFormatNote.isVisible = true
                         binding.tvAnswerFormatNote.text = "Answer must be strictly between 0 and 99"
                         binding.etAnswer.inputType = InputType.TYPE_CLASS_NUMBER
@@ -204,16 +217,27 @@ class PracticeActivity : AppCompatActivity() {
                     if (state.isAnswerRevealed) {
                         binding.containerAnswerInput.isVisible = false
                         binding.cardRevealedAnswer.isVisible = true
-                        binding.tvRevealedAnswerValue.text = question.correctAnswer
+                        binding.tvRevealedAnswerValue.text = "Answer: ${question.correctAnswer}"
                         val delta = state.lastEloDelta ?: 0
-                        binding.tvRevealedPenaltyNote.text = if (state.sessionConfig.isRiskFree) {
-                            "Risk-Free Mode: 0 Elo penalty applied"
+                        binding.tvRevealedPenaltyNote.text = when {
+                            state.lastSubmissionCorrect == true -> "Correct! Verified solution."
+                            state.sessionConfig.isRiskFree -> "Risk-Free Mode: 0 Elo penalty applied"
+                            else -> "Penalty applied: $delta Elo"
+                        }
+                        val solutionText = if (!question.proofSolution.isNullOrBlank()) {
+                            question.proofSolution
                         } else {
-                            "Penalty applied: $delta Elo"
+                            "\\textbf{Official Solution:}\n\nThe correct answer is $$${question.correctAnswer}$$."
+                        }
+                        binding.webViewRevealedMath.isVisible = true
+                        if (currentRenderedRevealedId != question.id) {
+                            currentRenderedRevealedId = question.id
+                            binding.webViewRevealedMath.setLatexContent(solutionText)
                         }
                     } else {
                         binding.containerAnswerInput.isVisible = true
                         binding.cardRevealedAnswer.isVisible = false
+                        binding.webViewRevealedMath.isVisible = false
                         binding.tvAnswerFormatNote.isVisible = true
                         binding.tvAnswerFormatNote.text = "Semantic AI evaluation enabled. Phrasing variations accepted."
                         binding.etAnswer.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
@@ -223,6 +247,7 @@ class PracticeActivity : AppCompatActivity() {
                 QuestionType.SUBJECTIVE_PROOF -> {
                     binding.containerAnswerInput.isVisible = false
                     binding.cardRevealedAnswer.isVisible = false
+                    binding.webViewRevealedMath.isVisible = false
                     binding.tvAnswerFormatNote.isVisible = false
                     binding.containerProofChoices.isVisible = !state.isProofSolutionRevealed
                     binding.cardProofSolution.isVisible = state.isProofSolutionRevealed
@@ -237,6 +262,7 @@ class PracticeActivity : AppCompatActivity() {
 
             if (currentRenderedQuestionId != question.id) {
                 currentRenderedQuestionId = question.id
+                currentRenderedRevealedId = null
                 binding.webViewProblemMath.setLatexContent(question.latexContent)
             }
         }
@@ -263,7 +289,9 @@ class PracticeActivity : AppCompatActivity() {
                 }
                 binding.tvEvaluationMessage.text = state.feedbackMessage ?: "Your solution matches the official Olympiad answer key. Outstanding precision."
                 binding.btnEvaluationNext.isVisible = true
-                binding.btnEvaluationRetry.isVisible = false
+                binding.btnEvaluationNext.text = "Next Problem  →"
+                binding.btnEvaluationRetry.isVisible = true
+                binding.btnEvaluationRetry.text = "Review Solution"
             } else {
                 binding.ivEvaluationStatus.setImageResource(R.drawable.ic_cancel_circle)
                 binding.tvEvaluationTitle.text = if (state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF) "Proof Under Review" else "Incorrect Answer"
@@ -271,8 +299,10 @@ class PracticeActivity : AppCompatActivity() {
                 val deltaSign = if (delta >= 0) "+$delta" else "$delta"
                 binding.tvEvaluationEloDelta.text = if (state.sessionConfig.isRiskFree || state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF) "Neutral Rating (0 Elo Delta)" else "$deltaSign Elo Rating"
                 binding.tvEvaluationMessage.text = state.feedbackMessage ?: "Re-examine your lemmas and calculations. Keep trying!"
-                binding.btnEvaluationNext.isVisible = state.currentQuestion?.resolvedType == QuestionType.SUBJECTIVE_PROOF
+                binding.btnEvaluationNext.isVisible = true
+                binding.btnEvaluationNext.text = "Skip Problem  →"
                 binding.btnEvaluationRetry.isVisible = state.currentQuestion?.resolvedType != QuestionType.SUBJECTIVE_PROOF
+                binding.btnEvaluationRetry.text = "Try Again"
             }
         } else {
             binding.overlayEvaluationResult.isVisible = false
