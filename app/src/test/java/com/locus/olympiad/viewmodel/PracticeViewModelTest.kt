@@ -10,7 +10,9 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -52,7 +54,7 @@ class PracticeViewModelTest {
 
     @Test
     fun testStartSession_InitializesSessionStateAndLoadsQuestion() = runTest {
-        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any()) } returns testQuestion
+        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any(), any()) } returns testQuestion
 
         val viewModel = PracticeViewModel(matchmakingRepository, aiTutorRepository, userPreferencesRepository)
         val config = PracticeSessionConfig(questionCount = 5, difficultyTier = "Intermediate")
@@ -66,7 +68,7 @@ class PracticeViewModelTest {
 
     @Test
     fun testSubmitAnswer_CorrectAnswerUpdatesEloAndSolvedCount() = runTest {
-        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any()) } returns testQuestion
+        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any(), any()) } returns testQuestion
         coEvery { matchmakingRepository.submitAnswer(testQuestion, "3", any(), any(), any()) } returns Pair(
             true,
             EloCalculationResult(1000, 1016, 16, 0.5, true, 1000)
@@ -88,7 +90,7 @@ class PracticeViewModelTest {
 
     @Test
     fun testShowAnswer_AppliesPenaltyAndRevealsAnswer() = runTest {
-        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any()) } returns testQuestion
+        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any(), any()) } returns testQuestion
         coEvery { matchmakingRepository.submitAnswer(testQuestion, "SHOW_ANSWER", any(), false, true) } returns Pair(
             false,
             EloCalculationResult(1000, 982, -18, 0.5, false, 1000)
@@ -108,7 +110,7 @@ class PracticeViewModelTest {
 
     @Test
     fun testRiskFreeMode_GuaranteesZeroEloDelta() = runTest {
-        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any()) } returns testQuestion
+        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any(), any()) } returns testQuestion
         coEvery { matchmakingRepository.submitAnswer(testQuestion, "3", any(), true, false) } returns Pair(
             true,
             EloCalculationResult(1000, 1000, 0, 0.5, true, 1000)
@@ -128,7 +130,7 @@ class PracticeViewModelTest {
 
     @Test
     fun testEndPractice_ConcludesSessionCleanly() = runTest {
-        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any()) } returns testQuestion
+        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any(), any()) } returns testQuestion
 
         val viewModel = PracticeViewModel(matchmakingRepository, aiTutorRepository, userPreferencesRepository)
         viewModel.startSession(PracticeSessionConfig(questionCount = 5))
@@ -151,7 +153,7 @@ class PracticeViewModelTest {
             correctAnswer = "Nesbitt Inequality holds",
             proofSolution = "By Cauchy-Schwarz in Engel form..."
         )
-        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any()) } returns proofQuestion
+        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any(), any()) } returns proofQuestion
         coEvery { matchmakingRepository.submitAnswer(proofQuestion, "SOLVED", any(), any(), any()) } returns Pair(
             true,
             EloCalculationResult(1000, 1000, 0, 0.5, true, 1450)
@@ -167,5 +169,25 @@ class PracticeViewModelTest {
         assertTrue(viewModel.uiState.value.isProofSolutionRevealed)
         assertEquals(1, viewModel.uiState.value.sessionSolvedCount)
         assertEquals(0, viewModel.uiState.value.sessionNetEloDelta)
+    }
+
+    @Test
+    fun testLoadNextQuestion_ExhaustedQuestionsTriggersCompletionDialog() = runTest {
+        coEvery { matchmakingRepository.getNextPracticeQuestion(any(), any(), any()) } returns null
+
+        val viewModel = PracticeViewModel(matchmakingRepository, aiTutorRepository, userPreferencesRepository)
+
+        var emittedEvent: UiEvent? = null
+        val job = launch {
+            emittedEvent = viewModel.uiEvent.first()
+        }
+
+        viewModel.loadNextQuestion(testQuestion.topic)
+        advanceUntilIdle()
+
+        assertTrue(emittedEvent is UiEvent.ShowCompletionDialog)
+        val dialogEvent = emittedEvent as UiEvent.ShowCompletionDialog
+        assertEquals("You have conquered this tier! No more questions available right now.", dialogEvent.message)
+        job.cancel()
     }
 }

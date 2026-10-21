@@ -11,9 +11,12 @@ import com.locus.olympiad.data.model.UserTopicProfile
 import com.locus.olympiad.domain.ai.AiTutorRepository
 import com.locus.olympiad.repository.MatchmakingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,6 +30,9 @@ class PracticeViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(PracticeUiState())
     val uiState: StateFlow<PracticeUiState> = _uiState.asStateFlow()
+
+    private val _uiEvent = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
     init {
         observeUserElo()
@@ -145,13 +151,15 @@ class PracticeViewModel @Inject constructor(
 
     /**
      * Loads the next question matched to the user's current rating or difficulty tier.
+     * Prevents repetition by querying only questions the user has not yet solved.
      */
     fun loadNextQuestion(category: MathTopic? = _uiState.value.sessionConfig.topic) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingQuestion = true, errorMessage = null) }
             try {
                 val difficultyTier = _uiState.value.sessionConfig.difficultyTier
-                val question = matchmakingRepository.getNextPracticeQuestion(category, difficultyTier)
+                val solvedIds = userPreferencesRepository.getSolvedQuestionIds().toList()
+                val question = matchmakingRepository.getNextPracticeQuestion(category, difficultyTier, solvedIds)
                 if (question != null) {
                     _uiState.update { current ->
                         current.copy(
@@ -171,9 +179,10 @@ class PracticeViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoadingQuestion = false,
-                            errorMessage = "No questions found matching your practice criteria."
+                            errorMessage = null
                         )
                     }
+                    _uiEvent.send(UiEvent.ShowCompletionDialog("You have conquered this tier! No more questions available right now."))
                 }
             } catch (e: Exception) {
                 _uiState.update {
@@ -270,6 +279,10 @@ class PracticeViewModel @Inject constructor(
                     isRiskFree = _uiState.value.sessionConfig.isRiskFree
                 )
 
+                if (isValidProof) {
+                    userPreferencesRepository.markQuestionSolved(question.id)
+                }
+
                 _uiState.update { current ->
                     current.copy(
                         userElo = eloResult.newElo,
@@ -327,6 +340,7 @@ class PracticeViewModel @Inject constructor(
                 )
 
                 if (isCorrect) {
+                    userPreferencesRepository.markQuestionSolved(question.id)
                     _uiState.update { current ->
                         current.copy(
                             userElo = eloResult.newElo,

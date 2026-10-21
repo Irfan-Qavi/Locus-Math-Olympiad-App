@@ -24,10 +24,12 @@ interface MatchmakingRepository {
     /**
      * Fetches the next practice question matched to the user's current Elo rating or configured difficulty.
      * If category is null, queries across all topics ("MIX ALL TYPES").
+     * Excludes questions whose IDs are present in solvedIds to prevent repetition.
      */
     suspend fun getNextPracticeQuestion(
         category: MathTopic?,
-        difficultyTier: String = "Adaptive"
+        difficultyTier: String = "Adaptive",
+        solvedIds: List<Long> = emptyList()
     ): PracticeQuestion?
 
     /**

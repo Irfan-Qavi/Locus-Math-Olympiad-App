@@ -107,6 +107,14 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.gson)
 
+    // Firebase BoM & Cloud Firestore
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore.ktx)
+
+    // Android WorkManager & Play Services Coroutines for Background Sync
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.kotlinx.coroutines.play.services)
+
     // Tests
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

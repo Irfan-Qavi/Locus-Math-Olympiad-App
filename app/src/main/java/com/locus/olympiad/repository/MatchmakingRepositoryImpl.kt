@@ -27,7 +27,8 @@ class MatchmakingRepositoryImpl(
 
     override suspend fun getNextPracticeQuestion(
         category: MathTopic?,
-        difficultyTier: String
+        difficultyTier: String,
+        solvedIds: List<Long>
     ): PracticeQuestion? = withContext(Dispatchers.IO) {
         val categoryName = category?.displayName
 
@@ -49,16 +50,18 @@ class MatchmakingRepositoryImpl(
             }
         }
 
-        var question = questionDao.findQuestionFiltered(categoryName, minElo, maxElo)
-        if (question == null) {
-            question = questionDao.findClosestQuestionFiltered(categoryName, targetElo)
+        val effectiveSolvedIds = if (solvedIds.isEmpty()) listOf(-1L) else solvedIds
+
+        var questions = questionDao.findQuestionsFiltered(categoryName, minElo, maxElo, effectiveSolvedIds)
+        if (questions.isEmpty()) {
+            questions = questionDao.findClosestQuestionsFiltered(categoryName, targetElo, effectiveSolvedIds)
         }
-        if (question == null && categoryName != null) {
+        if (questions.isEmpty() && categoryName != null) {
             // Fallback to any topic if the specific category had no questions
-            question = questionDao.findClosestQuestionFiltered(null, targetElo)
+            questions = questionDao.findClosestQuestionsFiltered(null, targetElo, effectiveSolvedIds)
         }
 
-        question
+        questions.firstOrNull()
     }
 
     override suspend fun getQuestionById(questionId: Long): PracticeQuestion? = withContext(Dispatchers.IO) {

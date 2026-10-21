@@ -172,11 +172,35 @@ class PracticeFragment : Fragment() {
     private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    renderUiState(state)
+                launch {
+                    viewModel.uiState.collect { state ->
+                        renderUiState(state)
+                    }
+                }
+                launch {
+                    viewModel.uiEvent.collect { event ->
+                        when (event) {
+                            is com.locus.olympiad.viewmodel.UiEvent.ShowCompletionDialog -> {
+                                showCompletionDialog(event.message)
+                            }
+                        }
+                    }
                 }
             }
         }
+    }
+
+    private fun showCompletionDialog(message: String) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Tier Conquered! 🏆")
+            .setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton("Finish Practice") { dialog, _ ->
+                dialog.dismiss()
+                viewModel.endPractice()
+                navigateBack()
+            }
+            .show()
     }
 
     private fun renderUiState(state: PracticeUiState) {

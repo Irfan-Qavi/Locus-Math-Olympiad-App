@@ -24,61 +24,98 @@ interface PracticeQuestionDao {
 
     /**
      * Primary Matchmaking Query:
-     * Returns a question in the selected category where difficulty_elo is within [minElo, maxElo] (+/- 150 pts).
+     * Returns a question in the selected category where difficulty_elo is within [minElo, maxElo] (+/- 150 pts),
+     * excluding already solved questions.
      */
     @Query("""
         SELECT * FROM practice_questions 
         WHERE category = :category 
           AND difficulty_elo BETWEEN :minElo AND :maxElo 
+          AND id NOT IN (:solvedIds)
         ORDER BY RANDOM() 
         LIMIT 1
     """)
     suspend fun findQuestionInEloRange(
         category: String, 
         minElo: Int, 
-        maxElo: Int
+        maxElo: Int,
+        solvedIds: List<Long>
     ): PracticeQuestion?
 
     /**
      * Fallback Matchmaking Query:
-     * When no question exists strictly within +/- 150 points, return the closest available question by Elo difference.
+     * When no question exists strictly within +/- 150 points, return the closest available question by Elo difference,
+     * excluding already solved questions.
      */
     @Query("""
         SELECT * FROM practice_questions 
         WHERE category = :category 
+          AND id NOT IN (:solvedIds)
         ORDER BY ABS(difficulty_elo - :targetElo) ASC 
         LIMIT 1
     """)
     suspend fun findClosestQuestion(
         category: String, 
-        targetElo: Int
+        targetElo: Int,
+        solvedIds: List<Long>
     ): PracticeQuestion?
 
     /**
-     * General Matchmaking Query (supports category = null for MIX ALL TYPES and specific difficulty ranges).
+     * General Matchmaking Query (supports category = null for MIX ALL TYPES and specific difficulty ranges),
+     * returning all matching candidates excluding already solved questions.
      */
     @Query("""
         SELECT * FROM practice_questions 
         WHERE (:category IS NULL OR category = :category)
           AND difficulty_elo BETWEEN :minElo AND :maxElo 
+          AND id NOT IN (:solvedIds)
+        ORDER BY RANDOM()
+    """)
+    suspend fun findQuestionsFiltered(
+        category: String?, 
+        minElo: Int, 
+        maxElo: Int,
+        solvedIds: List<Long>
+    ): List<PracticeQuestion>
+
+    @Query("""
+        SELECT * FROM practice_questions 
+        WHERE (:category IS NULL OR category = :category)
+          AND difficulty_elo BETWEEN :minElo AND :maxElo 
+          AND id NOT IN (:solvedIds)
         ORDER BY RANDOM() 
         LIMIT 1
     """)
     suspend fun findQuestionFiltered(
         category: String?, 
         minElo: Int, 
-        maxElo: Int
+        maxElo: Int,
+        solvedIds: List<Long>
     ): PracticeQuestion?
 
     @Query("""
         SELECT * FROM practice_questions 
         WHERE (:category IS NULL OR category = :category)
+          AND id NOT IN (:solvedIds)
+        ORDER BY ABS(difficulty_elo - :targetElo) ASC
+    """)
+    suspend fun findClosestQuestionsFiltered(
+        category: String?, 
+        targetElo: Int,
+        solvedIds: List<Long>
+    ): List<PracticeQuestion>
+
+    @Query("""
+        SELECT * FROM practice_questions 
+        WHERE (:category IS NULL OR category = :category)
+          AND id NOT IN (:solvedIds)
         ORDER BY ABS(difficulty_elo - :targetElo) ASC 
         LIMIT 1
     """)
     suspend fun findClosestQuestionFiltered(
         category: String?, 
-        targetElo: Int
+        targetElo: Int,
+        solvedIds: List<Long>
     ): PracticeQuestion?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

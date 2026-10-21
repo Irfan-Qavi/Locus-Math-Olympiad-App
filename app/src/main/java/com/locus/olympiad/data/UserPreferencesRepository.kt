@@ -109,6 +109,23 @@ class UserPreferencesRepository @Inject constructor(
             .apply()
     }
 
+    fun getSolvedQuestionIds(): Set<Long> {
+        val raw = prefs.getStringSet(KEY_SOLVED_QUESTION_IDS, emptySet()) ?: emptySet()
+        return raw.mapNotNull { it.toLongOrNull() }.toSet()
+    }
+
+    fun markQuestionSolved(questionId: Long) {
+        val current = getSolvedQuestionIds().toMutableSet()
+        current.add(questionId)
+        prefs.edit()
+            .putStringSet(KEY_SOLVED_QUESTION_IDS, current.map { it.toString() }.toSet())
+            .apply()
+    }
+
+    fun clearSolvedQuestions() {
+        prefs.edit().remove(KEY_SOLVED_QUESTION_IDS).apply()
+    }
+
     companion object {
         private const val PREFS_NAME = "locus_user_prefs"
         private const val KEY_USER_NAME = "key_user_name"
@@ -124,6 +141,7 @@ class UserPreferencesRepository @Inject constructor(
         private const val KEY_SESSION_SOLVED_COUNT = "key_session_solved_count"
         private const val KEY_SESSION_NET_ELO = "key_session_net_elo"
         private const val KEY_SESSION_CURRENT_QUESTION_ID = "key_session_current_question_id"
+        private const val KEY_SOLVED_QUESTION_IDS = "key_solved_question_ids"
     }
 }
 
