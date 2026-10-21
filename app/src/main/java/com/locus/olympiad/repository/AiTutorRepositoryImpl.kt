@@ -33,9 +33,9 @@ class AiTutorRepositoryImpl(
             Strict Directives for Mathematical & Semantic Equivalence:
             1. Numbers, Fractions, and Decimals: Fractions and decimals representing identical real values are strictly equivalent (e.g., "1/2", "0.5", "\frac{1}{2}", and "2^{-1}" are all equivalent).
             2. Equation vs Value: Stating the variable equation vs the isolated value is equivalent (e.g., "x = 2", "x=2", "k = 2", or simply "2" are all equivalent).
-            3. Algebraic & LaTeX Formats: Differences in LaTeX markup, spacing, parentheses, multiplication symbols, or variable ordering must be evaluated for algebraic equivalence (e.g., "x(x+1)", "x^2+x", "x \cdot (x+1)", and "$x^2+x$" are all equivalent).
+            3. Algebraic & LaTeX Formats: Differences in LaTeX markup, spacing, parentheses, multiplication symbols, or variable ordering must be evaluated for algebraic equivalence (e.g., "x(x+1)", "x^2+x", "x \cdot (x+1)", and "${'$'}x^2+x${'$'}" are all equivalent).
             4. Impossibility & Existence: Synonymous statements for non-existence must be treated as equivalent (e.g., "No solution", "None", "Impossible", "0 solutions", "Empty set", "Such a configuration does not exist", and "\emptyset" are all strictly equivalent).
-            5. Case & Whitespace Insensitive: Ignore capitalization, surrounding whitespace, and LaTeX dollar signs ($...$ or $$...$$).
+            5. Case & Whitespace Insensitive: Ignore capitalization, surrounding whitespace, and LaTeX dollar signs (${'$'}...${'$'} or ${'$'}${'$'}...${'$'}${'$'}).
             
             Output Requirement:
             Return STRICTLY a raw JSON object with no markdown fences, no explanatory text, and no backticks:
